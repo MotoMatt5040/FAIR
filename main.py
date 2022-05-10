@@ -17,7 +17,7 @@ formatter = logging.Formatter('%(asctime)s:%(name)s:%(funcName)s:%(levelName)s:%
 file_handler = logging.FileHandler('logs\main.log')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
-logger.propegate = False
+logger.propagate = False
 
 if __name__ == '__main__':
     pass
