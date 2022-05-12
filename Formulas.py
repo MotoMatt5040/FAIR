@@ -75,7 +75,7 @@ print(f'Interest Rate = {r}')
 
 # TODO Stock Returns
 
-# Price Returns
+    # TODO Price Returns
 
 # r = ((P_(t+1))/P_t)-1
 
@@ -87,7 +87,7 @@ print(f'Interest Rate = {r}')
 
 print(f'Price Return = {56.5 / 50 - 1}')
 
-# Total Returns
+    # TODO Total Returns
 
 # r = ((P_(t+1))+(D_(t+1)))/(P_t)-1 = (P_(t+1))/(P_t)-1+(D_(t+1))/(P_t)
 
