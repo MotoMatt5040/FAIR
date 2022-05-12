@@ -72,3 +72,27 @@ n = 3
 r = (FV/PV)**(1/n)-1
 
 print(f'Interest Rate = {r}')
+
+# TODO Stock Returns
+
+# Price Returns
+
+# r = ((P_(t+1))/P_t)-1
+
+# NOTE _ represents base
+# P_t = Price at timestamp t
+# r = Period Return
+
+# Example - One year ago you invested 50 USD in a stock that is now worth 56.5 USD
+
+print(f'Price Return = {56.5 / 50 - 1}')
+
+# Total Returns
+
+# r = ((P_(t+1))+(D_(t+1)))/(P_t)-1 = (P_(t+1))/(P_t)-1+(D_(t+1))/(P_t)
+
+# D = Dividend
+
+# Example - One year ago you invested 50 USD in a stock that recently paid a Dividend of 2 USD and is now worth 56.5 USD
+
+print(f'Total Return = {(56.5+2)/50-1}')
