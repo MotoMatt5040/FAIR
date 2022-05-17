@@ -124,4 +124,23 @@ n = n[::-1]
 for i in range(len(cf)):
     fv += cf[i] * f**n[i]
     print(fv)
-print(f'Future Value = {fv}')
+print(f'Future Value with Cashflow= {fv}')
+
+# TODO PV with Cashflow
+
+# Example - 1 Today you agreed on a payout plan that guarantees payouts of
+# - 50 USD in t1
+# - 60 USD in t2
+# - 70 USD in t3
+# - 80 USD in t4
+# - 100 USD in t5
+
+# Calculate the Funding amount / PV that needs to be paid into the plan today (t0). Assume an interest rate of 4% p.a.
+
+cf = [50, 60, 70, 80, 100]
+f = 1.04
+pv = 0
+for i in range(len(cf)):
+    pv += cf[i] / f**(i+1)
+    print(pv)
+print(f'Present Value with Cashflow = {pv}')
