@@ -117,9 +117,11 @@ cf = [100, 10, 20, 50, 30, 25]
 r = .03
 f = 1+r
 fv = 0
+n = n[::-1]
 # FV = cf[0] * f**n[-1] + cf[1] * f**n[-2] + cf[2] * f**n[-3] + cf[3] * f**n[-4] + cf[4] * f**n[-5] + cf[5]
 
 # Calculate the FV of your savings account after 5 years given an interest rate of 3% p.a.
 for i in range(len(cf)):
-    fv += cf[i] * f**n[-(i+1)]
+    fv += cf[i] * f**n[i]
+    print(fv)
 print(f'Future Value = {fv}')
