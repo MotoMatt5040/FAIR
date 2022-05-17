@@ -96,3 +96,30 @@ print(f'Price Return = {56.5 / 50 - 1}')
 # Example - One year ago you invested 50 USD in a stock that recently paid a Dividend of 2 USD and is now worth 56.5 USD
 
 print(f'Total Return = {(56.5+2)/50-1}')
+
+# TODO FV With Cashflow
+
+# FV_N = Future Value at N
+# CF_t = cashflow at timestamp t
+# N = Total number of periods
+# r = Interest Rate (per period)
+# t = timestamp
+
+# Example - Today you have 100 USD in your savings account and you save another
+# - 10 USD in t1
+# - 20 USD in t2
+# - 50 USD in t3
+# - 30 USD in t4
+# - 25 USD in t5
+
+n = [0, 1, 2, 3, 4, 5]
+cf = [100, 10, 20, 50, 30, 25]
+r = .03
+f = 1+r
+fv = 0
+# FV = cf[0] * f**n[-1] + cf[1] * f**n[-2] + cf[2] * f**n[-3] + cf[3] * f**n[-4] + cf[4] * f**n[-5] + cf[5]
+
+# Calculate the FV of your savings account after 5 years given an interest rate of 3% p.a.
+for i in range(len(cf)):
+    fv += cf[i] * f**n[-(i+1)]
+print(f'Future Value = {fv}')
