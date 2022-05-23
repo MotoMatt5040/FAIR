@@ -123,7 +123,6 @@ n = n[::-1]
 # Calculate the FV of your savings account after 5 years given an interest rate of 3% p.a.
 for i in range(len(cf)):
     fv += cf[i] * f**n[i]
-    print(fv)
 print(f'Future Value with Cashflow= {fv}')
 
 # TODO PV with Cashflow
@@ -142,5 +141,39 @@ f = 1.04
 pv = 0
 for i in range(len(cf)):
     pv += cf[i] / f**(i+1)
-    print(pv)
 print(f'Present Value with Cashflow = {pv}')
+
+# TODO Net Present Value (NPV)
+
+# NPV = Net Present Value
+# I_0 = Initial Investment (negative)
+# CF_t = Cashflow at timestamp tclN = Total number of periods
+# r = required rate of return
+# t = timestamp
+
+# Example 1 - The XYZ Company evaluates to buy an additional machine that will increase future profits/cashflows by
+# - 20 USD in t1
+# - 50 USD in t2
+# - 70 USD in t3
+# - 100 USD in t4
+# - 50 USD in t5
+
+# The machine costs 200 USD (Investment in to). Calculate the Project's NPV and evaluate whether XYZ should pursue the
+# project. XYZ's required rate of return (Cost of Capital) is 6% p.a.
+
+cf = [-200, 20, 50, 70, 100, 50]
+r = .06
+f = 1+r
+npv = 0
+for i in range(len(cf)):
+    npv += cf[i] / f**i
+print(f'NPV = {npv}... Good idea - Value is positive')
+
+# What if initial investment is $250?
+cf = [-250, 20, 50, 70, 100, 50]
+r = .06
+f = 1+r
+npv = 0
+for i in range(len(cf)):
+    npv += cf[i] / f**i
+print(f'NPV = {npv}... Bad idea - Value is negative')
