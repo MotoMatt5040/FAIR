@@ -12,7 +12,7 @@ logging.root.setLevel(logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(funcName)s:%(levelName)s:%(message)s')
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(funcName)s:%(message)s')
 file_handler = logging.FileHandler('logs\main.log')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
@@ -28,14 +28,12 @@ logger.propagate = False
 #     except:
 #         print('Incorrect user.')
 # password = input('Password: ')
-#
-# from bot import Bot
-# import MetaTrader5 as mt5
 
-#
+logger.info('Opening/Initializing MT5 Connection')
 mt5.initialize()
 
-macd_bot = Bot(0.1, 60, "Boom 300 Index")
+
+macd_bot = Bot(lotage=0.1, time_period=60, market="Boom 300 Index")
 
 macd_bot.start()
 macd_bot.wait()

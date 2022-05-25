@@ -1,6 +1,15 @@
+import logging
+
 import MetaTrader5 as mt5
 import Candle, threading, Orders
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(funcName)s:%(message)s')
+file_handler = logging.FileHandler('logs\\bot.log')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+logger.propagate = False
 
 class Bot:
 
@@ -12,6 +21,12 @@ class Bot:
             time_period (int): Time period of the bot, 1 minute, 15 minutes... (in seconds)
             market (str): Market to operate in.
         """
+        logger.info(
+            f'''Initializing Bot with the following parameters:
+    Lotage: {lotage}
+    Time Period: {time_period}
+    Market: {market}'''
+        )
         self.threads = []
         self.data = {'0': None, '1': None}
         self.pill2kill = threading.Event()
@@ -22,11 +37,13 @@ class Bot:
 
     def thread_candles(self):
         """Function to launch the data thread."""
+        logger.info('Creating threads for Candles')
         t = threading.Thread(target=Candle.thread_candle,
                              args=(self.pill2kill, self.data))
         self.threads.append(t)
         t.start()
-        print('Thread - DATA. LAUNCHED')
+        logger.info(f'''Threads started with the following parameters
+Thread: {t}''')
 
     def thread_orders(self):
         """Function to launch the thread for sending orders."""
@@ -45,6 +62,7 @@ class Bot:
 
     def start(self):
         """Function to start all the threads"""
+        logger.info('Starting bot...')
         self.thread_candles()
         self.thread_orders()
 
