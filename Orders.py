@@ -1,5 +1,15 @@
+import logging
+
 import MetaTrader5 as mt5
 import datetime
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s:%(name)s:%(funcName)s:%(message)s')
+file_handler = logging.FileHandler('logs\\bot.log')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+logger.propagate = False
 
 CANDLES_BETWEEN_OPERATIONS = 3
 STOPLOSS = 15000
@@ -13,6 +23,11 @@ def open_position(market: str, lotage: float, type_op):
         lotage (float)
         type_op: Type of the operation
     """
+    logger.info(f'''Opening positions:
+    Market: {market}
+    Lotage: {lotage}
+    Order Type: {type_op}
+''')
     point = mt5.symbol_info(market).point
     price = mt5.symbol_info_tick(market).ask
 

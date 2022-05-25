@@ -3,8 +3,11 @@
 # 5/10/2022
 
 import logging
+
+import pandas as pd
 import MetaTrader5 as mt5
 from bot import Bot
+import keyboard
 
 logging.basicConfig(level=logging.DEBUG)
 logging.root.setLevel(logging.DEBUG)
@@ -17,9 +20,9 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 logger.propagate = False
 
-login = False
 usr = None
 password = None
+server = None
 
 while usr is None:
     try:
@@ -27,13 +30,41 @@ while usr is None:
     except:
         print('Incorrect user.')
 password = input('Password: ')
+print('''Which server would you like to connect to?
+    1: MetaQuotes-Demo''')
+while server is None:
+    if keyboard.is_pressed('1'):
+        server = 'MetaQuotes-Demo'
+        print(f'\nYou selected: {server}\n')
 
 logger.info('Opening/Initializing MT5 Connection')
-LOGIN = 5003534489
-PASSWORD = '6jsxifbk'
-mt5.initialize(login=usr, password=password, server='MetaQuotes-Demo')
-print(mt5.account_info())
-
+usr = 5003534489
+password = '6jsxifbk'
+if mt5.initialize(login=usr, password=password, server='MetaQuotes-Demo'):
+    print(f'Connection to MetaTrader5 server successful.')
+    print()
+    account_info = mt5.account_info()
+    if account_info is not None:
+        account_info_dict = mt5.account_info()._asdict()
+        print('*****Account Info*****\n')
+        for item in account_info_dict:
+            print(f"{item}: {account_info_dict[item]}")
+        print()
+        print()
+    terminal_info = mt5.terminal_info()
+    if terminal_info is not None:
+        print('*****Terminal Info*****\n')
+        terminal_info_dict = mt5.terminal_info()._asdict()
+        for item in terminal_info_dict:
+            print(f"{item}: {terminal_info_dict[item]}")
+        print()
+        print()
+else:
+    quit(f'''Connection to MetaTrader5 server unsuccessful!
+    Error: {mt5.last_error()}
+    
+    Please restart the program.
+''')
 
 macd_bot = Bot(lotage=0.1, time_period=60, market="Boom 300 Index")
 
