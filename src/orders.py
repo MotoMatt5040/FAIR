@@ -5,7 +5,9 @@ import MetaTrader5 as mt5
 # Global variables
 THRESHOLD = 20
 MARGIN = 10
-TIME_BETWEEN_OPERATIONS = 15 * 60 * 10
+# TODO ADJUST TIME BETWEEN OPERATIONS
+# TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
+TIME_BETWEEN_OPERATIONS = 10
 STOPLOSS = 100
 TAKEPROFIT = 100
 
@@ -171,7 +173,7 @@ def open_sell(trading_data: dict):
         print("[Thread - orders]", dt_string, "- Spread too high. Spread =", symbol_info.spread)
         return None
 
-    # si el símbolo no está disponible en MarketWatch, lo añadimos
+    # if the symbol is not available in MarketWatch, we add it
     if not symbol_info.visible:
         print("[Thread - orders]", trading_data['market'], "is not visible, trying to switch on")
         if not mt5.symbol_select(trading_data['market'], True):
@@ -214,8 +216,11 @@ def check_buy() -> bool:
     Returns:
         bool: True if we can, false if not.
     """
+    # TODO REMOVE PRINT LINES
+    # print(MACD.check_buy(), RSI.check_buy())
     return MACD.check_buy() and RSI.check_buy()
-
+    # TODO FIX RETURN STATEMENT
+    # return True
 
 def check_sell() -> bool:
     """Function to check if we can open a sell.
@@ -223,8 +228,9 @@ def check_sell() -> bool:
     Returns:
         bool: True if we can, false if not.
     """
+    # TODO FIX RETURN STATEMENT
     return MACD.check_sell() and RSI.check_sell()
-
+    # return True
 
 def thread_orders(pill2kill, trading_data: dict):
     """Function executed by a thread. It opens and handles operations.
@@ -237,8 +243,10 @@ def thread_orders(pill2kill, trading_data: dict):
     print("[THREAD - orders] - Working")
 
     last_operation = 0
-    print("[THREAD - orders] - Checking operations")
+    print("[THREAD - orders] - Checking operations\n")
     while not pill2kill.wait(0.1):
+        # TODO REMOVE PRINT STATEMENT
+        # print(check_buy(), check_sell(), last_operation, TIME_BETWEEN_OPERATIONS)
         if check_buy() and last_operation > TIME_BETWEEN_OPERATIONS:
             buy = open_buy(trading_data)
             last_operation = 0

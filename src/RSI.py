@@ -10,6 +10,7 @@ def check_buy() -> bool:
     Returns:
         bool: True if RSI allows, false if not.
     """
+    print(RSI_value)
     if RSI_value is None:
         return False
     else:
