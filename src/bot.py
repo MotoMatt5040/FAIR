@@ -94,7 +94,7 @@ class Bot:
 
     def mt5_login(self, usr: int, password: str) -> bool:
         """Function to initialize the metatrader 5 aplication
-        and login wiht our account details.
+        and login with our account details.
 
         Args:
             usr (int): User ID.
