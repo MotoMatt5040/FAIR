@@ -1,5 +1,6 @@
 import threading
 import MetaTrader5 as mt5
+import tick_reader, slope_abs_rel, orders
 
 class Bot:
     threads = []
@@ -25,7 +26,7 @@ class Bot:
     }
 
     def __init__(self, lotage: float, time_period: int, market: str):
-        """Constructor of the bot. It justs fills the needed informartion for the bot.
+        """Constructor of the bot. It just fills the needed information for the bot.
 
                 Args:
                     lotage (float): Lotage to be used by the bot.
@@ -38,8 +39,42 @@ class Bot:
         self.trading_data['market'] = market
         self.trading_data['avg_spread'] = 0
 
+    def get_ticks(self) -> list:
+        """Method to get the ticks.
+
+        Returns:
+            list: List of ticks
+        """
+        return self.ticks
+
+    def thread_tick_reader(self):
+        """Function to launch the tick reader thread.
+        """
+        t = threading.Thread(target=tick_reader.thread_tick_reader,
+                             args=(self.pill2kill, self.ticks, self.trading_data,))
+        self.threads.append(t)
+        t.start()
+        print('Thread - tick_reader. LAUNCHED')
+
+    def thread_slope_abs_rel(self):
+        """Function to launch the thread for calculating the slope
+        and, the absolute and relative points in the chart.
+        """
+        t = threading.Thread(target=slope_abs_rel.thread_slope_abs_rel,
+                             args=(self.pill2kill, self.ticks, self.indicators))
+        self.threads.append(t)
+        t.start()
+        print('Thread - slope_abs_rel. LAUNCHED')
+
+    def thread_orders(self):
+        t = threading.Thread(target=orders.thread_orders,
+                             args=(self.pill2kill, self.trading_data))
+        self.threads.append(t)
+        t.start()
+        print('Thread - orders. LAUNCHED')
+
     def mt5_login(self, usr: int, password: str, server: str) -> bool:
-        """Function to initialize the metatrader 5 aplication
+        """Function to initialize the metatrader 5 application
                 and login with our account details.
 
                 Args:
@@ -60,3 +95,20 @@ class Bot:
             print("failed to connect at account #{}, error code: {}".format(usr, mt5.last_error()))
             return False
         return True
+
+    def kill_threads(self):
+        """Function to kill all the loaded threads.
+        """
+        print('Threads - Stopping threads')
+        self.pill2kill.set()
+        for thread in self.threads:
+            thread.join()
+
+    def wait(self):
+        """Function to make the thread wait.
+        """
+        # Input to stop the threads
+        print('\nPress ENTER to stop the bot\n')
+        input()
+        self.kill_threads()
+        mt5.shutdown()

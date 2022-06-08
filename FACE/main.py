@@ -4,9 +4,9 @@
 
 import logging
 
-import MetaTrader5 as mt5
 import bot
 import keyboard
+import matplotlib.pyplot as plt
 
 logging.basicConfig(level=logging.DEBUG)
 logging.root.setLevel(logging.DEBUG)
@@ -36,3 +36,21 @@ while server is None:
 # Login into mt5
 if not b.mt5_login(usr, password, server):
     quit()
+b.thread_tick_reader()
+b.thread_slope_abs_rel()
+b.thread_orders()
+b.wait()
+
+# Making a graph of the data
+second_list = b.get_ticks()
+xAxis = []
+yAxis = []
+i = 1
+if len(second_list) < 10000:
+    for element in b.get_ticks():
+        xAxis.append(i)
+        yAxis.append(element)
+        i += 1
+
+plt.plot(xAxis, yAxis)
+plt.show()
