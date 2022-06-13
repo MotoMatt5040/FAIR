@@ -9,15 +9,8 @@ plt.style.use('seaborn')
 
 api = tpqoa.tpqoa("oanda.cfg")
 #
-account_summary = api.get_account_summary()
-
-print(account_summary)
-
-for item in account_summary:
-    print(f'{item}: {account_summary[item]}')
-
-# _ticker = ["AAPL", "BA", "KO", 'IBM', "DIS", 'MSFT']
-# stocks = yf.download(tickers=_ticker, start=date.today() - timedelta(365), end=date.today())
+# ticker = ["AAPL", "BA", "KO", 'IBM', "DIS", 'MSFT']
+# stocks = yf.download(tickers=ticker, start=date.today() - timedelta(365), end=date.today())
 # # print(stocks.to_string())
 # stocks.to_csv('stocks.csv')
 # stocks = pd.read_csv('stocks.csv', header=[0, 1], index_col=[0], parse_dates=[0])
