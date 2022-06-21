@@ -20,7 +20,7 @@ def check_buy() -> bool:
         bool: True if it is a buy opportunity, false if not
     """
     # TODO REMOVE PRINT LINE
-    print(f'Previous MACD: {PREV_MACD}|Previous Signal: {PREV_SIGNAL}||Current MACD: {CUR_MACD}|Current Signal: {CUR_SIGNAL}')
+    # print(f'Previous MACD: {PREV_MACD}|Previous Signal: {PREV_SIGNAL}||Current MACD: {CUR_MACD}|Current Signal: {CUR_SIGNAL}')
     if CUR_SIGNAL == None or CUR_MACD == None \
         or PREV_SIGNAL == None or PREV_MACD == None:
         return False
@@ -204,7 +204,7 @@ def thread_macd(pill2kill, ticks: list, indicators: dict, trading_data: dict):
         indicators['MACD']['MACD'] = CUR_MACD
         indicators['MACD']['SIGNAL'] = CUR_SIGNAL
         # TODO REMOVE PRINT LINE
-        print(PREV_MACD, PREV_SIGNAL, CUR_MACD, CUR_SIGNAL)
+        # print(PREV_MACD, PREV_SIGNAL, CUR_MACD, CUR_SIGNAL)
 
         if len(MACDs) > 9:
             del MACDs[0]
