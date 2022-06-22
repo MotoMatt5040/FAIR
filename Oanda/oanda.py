@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 plt.style.use('seaborn')
 
 api = tpqoa.tpqoa("oanda.cfg")
+
+print(api.get_account_summary())
 #
 # ticker = ["AAPL", "BA", "KO", 'IBM', "DIS", 'MSFT']
 # stocks = yf.download(tickers=ticker, start=date.today() - timedelta(365), end=date.today())
