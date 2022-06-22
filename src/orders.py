@@ -8,8 +8,8 @@ MARGIN = 10
 # TODO ADJUST TIME BETWEEN OPERATIONS
 # TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
 TIME_BETWEEN_OPERATIONS = 10
-STOPLOSS = 100
-TAKEPROFIT = 100
+STOPLOSS = 20
+TAKEPROFIT = 10000
 
 
 def handle_buy(buy, market):
@@ -31,7 +31,7 @@ def handle_buy(buy, market):
                 "symbol": market,
                 "sl": tick.ask - MARGIN * point,
                 "tp": tick.ask + MARGIN * point,
-                "deviation": 20,
+                "deviation": 40,
                 "magic": 234000,
                 "comment": "python script open",
                 "type_time": mt5.ORDER_TIME_GTC,
@@ -65,7 +65,7 @@ def handle_sell(sell, market: str):
                 "symbol": market,
                 "sl": tick.bid + MARGIN * point,
                 "tp": tick.bid - MARGIN * point,
-                "deviation": 20,
+                "deviation": 40,
                 "magic": 234000,
                 "comment": "python script open",
                 "type_time": mt5.ORDER_TIME_GTC,
@@ -97,7 +97,7 @@ def open_buy(trading_data: dict):
     counter = 0
     # We only open the operation if the spread is 0
     # we check the spread 300000 times
-    while symbol_info.spread > 0 and counter < 300000:
+    while symbol_info.spread > 10 and counter < 300000:
         counter += 1
         symbol_info = mt5.symbol_info(trading_data['market'])
 
@@ -117,7 +117,7 @@ def open_buy(trading_data: dict):
 
     point = mt5.symbol_info(trading_data['market']).point
     price = mt5.symbol_info_tick(trading_data['market']).ask
-    deviation = 20
+    deviation = 40
     buy = {
         "action": mt5.TRADE_ACTION_DEAL,
         "symbol": trading_data['market'],
@@ -139,9 +139,12 @@ def open_buy(trading_data: dict):
         "[Thread - orders] 1. order_send(): by {} {} lots at {} with deviation={} points".format(trading_data['market'],
                                                                                                  trading_data['lotage'],
                                                                                                  price, deviation))
-    if result.retcode != mt5.TRADE_RETCODE_DONE:
-        print("[Thread - orders] Failed buy: retcode={}".format(result.retcode))
-        return None
+    try:
+        if result.retcode != mt5.TRADE_RETCODE_DONE:
+            print("[Thread - orders] Failed buy: retcode={}".format(result.retcode))
+            return None
+    except Exception as err:
+        print(err)
     return buy
 
 
@@ -162,7 +165,7 @@ def open_sell(trading_data: dict):
     counter = 0
     # We only open the operation if the spread is 0
     # we check the spread 300000 times
-    while symbol_info.spread > 0 and counter < 300000:
+    while symbol_info.spread > 10 and counter < 300000:
         counter += 1
         symbol_info = mt5.symbol_info(trading_data['market'])
 
@@ -182,7 +185,7 @@ def open_sell(trading_data: dict):
 
     point = mt5.symbol_info(trading_data['market']).point
     price = mt5.symbol_info_tick(trading_data['market']).bid
-    deviation = 20
+    deviation = 40
     sell = {
         "action": mt5.TRADE_ACTION_DEAL,
         "symbol": trading_data['market'],
@@ -204,9 +207,12 @@ def open_sell(trading_data: dict):
         "[Thread - orders] 1. order_send(): by {} {} lots at {} with deviation={} points".format(trading_data['market'],
                                                                                                  trading_data['lotage'],
                                                                                                  price, deviation))
-    if result.retcode != mt5.TRADE_RETCODE_DONE:
-        print("[Thread - orders] failed sell: {}".format(result.retcode))
-        return None
+    try:
+        if result.retcode != mt5.TRADE_RETCODE_DONE:
+            print("[Thread - orders] failed sell: {}".format(result.retcode))
+            return None
+    except Exception as err:
+        print(err)
     return sell
 
 

@@ -205,7 +205,7 @@ class RiskReturn():
         risk = round(self.data.log_returns.std() * np.sqrt(252), 3)
         print(f'Return: {mean_return} | Risk: {risk}')
 
-stock = FinancialInstrument('AAPL', '2015-01-01', '2019-12-31')
+stock = RiskReturn('AAPL', '2015-01-01', '2019-12-31')
 print(stock)
 
 # stock.set_ticker('GE')

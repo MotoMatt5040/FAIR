@@ -56,6 +56,10 @@ def RS(ticks: list) -> float:
     
     up /= len(ticks)
     down /= len(ticks)
+
+    # TODO Verify its safe to return 0 in this instance
+    if down == 0:
+        return 0
     
     return up/down
 

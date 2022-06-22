@@ -21,7 +21,7 @@ logger.propagate = False
 # Creating a bot
 # TODO Fix bot statement
 # b = bot.Bot(0.01, 5 * 60, "XAUUSD")
-b = bot.Bot(1.5, 10, "XAUUSD")
+b = bot.Bot(1.5, 10, "USDJPY")
 
 with open("login_data.txt", 'r') as f:
     lines = f.readlines()
