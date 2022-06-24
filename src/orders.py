@@ -9,8 +9,40 @@ MARGIN = 10
 # TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
 TIME_BETWEEN_OPERATIONS = 10
 STOPLOSS = 10
-TAKEPROFIT = 25
+TAKEPROFIT = 100
+TRAIL_AMOUNT = 0.001 # 10 pips
 
+
+def handle_stoploss(order: int, position):
+
+    ticket = position.ticket
+    symbol = position.symbol
+    order_type = position.type
+    price_current = position.price_current
+    price_open = position.price_open
+    sl = position.sl
+    # calculating distance from sl
+    dist_from_sl = abs(round(price_current - sl, 6))
+
+    # calculating new sl
+    if dist_from_sl > TRAIL_AMOUNT:
+        if sl != 0.0:
+            if order_type == 0:  # BUY
+                sl = sl + TRAIL_AMOUNT
+            elif order_type == 1:  # SELL
+                sl = sl - TRAIL_AMOUNT
+        request = {
+            "action": mt5.TRADE_ACTION_SLTP,
+            "sl": sl,
+            "position": ticket
+        }
+
+        result = mt5.order_send(request)
+
+    else:
+        sl = price_open - TRAIL_AMOUNT if order_type == 0 else price_open + TRAIL_AMOUNT
+        return
+    return result
 
 def handle_buy(buy, market):
     """Function to handle a buy operation.
@@ -40,9 +72,13 @@ def handle_buy(buy, market):
             }
             GOAL = tick.ask + 1 * point
             mt5.order_send(request)
+
+        # print(f'position: {mt5.positions_get(ticket=position)}')
         # We check if the operation has been closed in order to leave the function
         if len(mt5.positions_get(ticket=position)) == 0:
             return
+        else:
+            handle_stoploss(1, mt5.positions_get(ticket=position)[0])
         time.sleep(0.1)
 
 
@@ -74,9 +110,12 @@ def handle_sell(sell, market: str):
             }
             GOAL = tick.bid - 1 * point
             mt5.order_send(request)
+        # print(f'position: {mt5.positions_get(ticket=position)}')
         # We check if the operation has been closed in order to leave the function
         if len(mt5.positions_get(ticket=position)) == 0:
             return
+        else:
+            handle_stoploss(1, mt5.positions_get(ticket=position)[0])
         time.sleep(0.1)
 
 
@@ -253,10 +292,12 @@ def thread_orders(pill2kill, trading_data: dict):
     while not pill2kill.wait(0.1):
         # TODO REMOVE PRINT STATEMENT
         # print(check_buy(), check_sell(), last_operation, TIME_BETWEEN_OPERATIONS)
+        order = 2
         if check_buy() and last_operation > TIME_BETWEEN_OPERATIONS:
             buy = open_buy(trading_data)
             last_operation = 0
             if buy is not None:
+                order = 0
                 now = date.datetime.now()
                 dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
                 print("[Thread - orders] Buy open -", dt_string)
@@ -267,9 +308,11 @@ def thread_orders(pill2kill, trading_data: dict):
             sell = open_sell(trading_data)
             last_operation = 0
             if sell is not None:
+                order = 2
                 now = date.datetime.now()
                 dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
                 print("[Thread - orders] Sell open -", dt_string)
                 handle_sell(sell, trading_data['market'])
                 sell = None
+
         last_operation += 1

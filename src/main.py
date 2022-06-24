@@ -40,18 +40,18 @@ b.thread_orders()
 b.wait()
 
 # Making a graph of the data
-second_list = b.get_ticks()
-xAxis = []
-yAxis = []
-i = 1
-if len(second_list) < 10000:
-    for element in b.get_ticks():
-        xAxis.append(i)
-        yAxis.append(element)
-        i += 1
-
-plt.plot(xAxis, yAxis)
-plt.show()
+# second_list = b.get_ticks()
+# xAxis = []
+# yAxis = []
+# i = 1
+# if len(second_list) < 10000:
+#     for element in b.get_ticks():
+#         xAxis.append(i)
+#         yAxis.append(element)
+#         i += 1
+#
+# plt.plot(xAxis, yAxis)
+# plt.show()
 
 
 if __name__ == '__main__':
