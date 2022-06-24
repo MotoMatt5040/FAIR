@@ -21,7 +21,12 @@ logger.propagate = False
 # Creating a bot
 # TODO Fix bot statement
 # b = bot.Bot(0.01, 5 * 60, "XAUUSD")
-b = bot.Bot(1.5, 10, "USDJPY")
+b = bot.Bot(3.0, 10, "USDJPY")
+
+markets = ['EURUSD', 'GBPUSD', 'XAUUSD', 'USDJPY']
+
+# for market in markets:
+
 
 with open("login_data.txt", 'r') as f:
     lines = f.readlines()

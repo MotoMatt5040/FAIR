@@ -8,9 +8,9 @@ MARGIN = 10
 # TODO ADJUST TIME BETWEEN OPERATIONS
 # TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
 TIME_BETWEEN_OPERATIONS = 10
-STOPLOSS = 10
+STOPLOSS = 20
 TAKEPROFIT = 100
-TRAIL_AMOUNT = 0.001 # 10 pips
+TRAIL_AMOUNT = 0.003 # 10 pips
 
 
 def handle_stoploss(order: int, position):
@@ -63,7 +63,7 @@ def handle_buy(buy, market):
                 "symbol": market,
                 "sl": tick.ask - MARGIN * point,
                 "tp": tick.ask + MARGIN * point,
-                "deviation": 40,
+                "deviation": 20,
                 "magic": 234000,
                 "comment": "python script open",
                 "type_time": mt5.ORDER_TIME_GTC,
@@ -101,7 +101,7 @@ def handle_sell(sell, market: str):
                 "symbol": market,
                 "sl": tick.bid + MARGIN * point,
                 "tp": tick.bid - MARGIN * point,
-                "deviation": 40,
+                "deviation": 20,
                 "magic": 234000,
                 "comment": "python script open",
                 "type_time": mt5.ORDER_TIME_GTC,
@@ -156,7 +156,7 @@ def open_buy(trading_data: dict):
 
     point = mt5.symbol_info(trading_data['market']).point
     price = mt5.symbol_info_tick(trading_data['market']).ask
-    deviation = 40
+    deviation = 20
     buy = {
         "action": mt5.TRADE_ACTION_DEAL,
         "symbol": trading_data['market'],
@@ -224,7 +224,7 @@ def open_sell(trading_data: dict):
 
     point = mt5.symbol_info(trading_data['market']).point
     price = mt5.symbol_info_tick(trading_data['market']).bid
-    deviation = 40
+    deviation = 20
     sell = {
         "action": mt5.TRADE_ACTION_DEAL,
         "symbol": trading_data['market'],
