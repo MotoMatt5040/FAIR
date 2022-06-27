@@ -31,6 +31,7 @@ def handle_stoploss(order: int, position):
                 sl = sl + TRAIL_AMOUNT
             elif order_type == 1:  # SELL
                 sl = sl - TRAIL_AMOUNT
+            print(f'Trailing stoploss: {sl}')
         request = {
             "action": mt5.TRADE_ACTION_SLTP,
             "sl": sl,
