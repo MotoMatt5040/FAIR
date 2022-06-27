@@ -3,6 +3,9 @@
 # 5/10/2022
 
 import logging
+import time
+
+import keyboard
 
 import bot
 import matplotlib.pyplot as plt
@@ -28,14 +31,44 @@ markets = ['EURUSD', 'GBPUSD', 'XAUUSD', 'USDJPY']
 # for market in markets:
 
 
-with open("login_data.txt", 'r') as f:
-    lines = f.readlines()
-    usr = int(lines[0])
-    password = lines[1]
+# with open("login_data.txt", 'r') as f:
+#     lines = f.readlines()
+#     usr = int(lines[0])
+#     password = lines[1]
 
+print('''Which account would you like to use
+    1: MT5 Demo
+    2: Hanko Demo''')
+usr = None
+while usr is None:
+    if keyboard.is_pressed('1'):
+        usr = 5003534489
+        password = '6jsxifbk'
+        print(f'\nYou selected: {usr}\n')
+    elif keyboard.is_pressed('2'):
+        usr = 805062
+        password = 'R6rz@i@Ue!#bCAn'
+        print(f'\nYou selected: {usr}\n')
+
+time.sleep(0.1)
+print('''Which server would you like to connect to?
+    1: MetaQuotes-Demo
+    2: OANDA-Demo-2
+    3: Hankotrade-Demo''')
+server = None
+while server is None:
+    if keyboard.is_pressed('1'):
+        server = 'MetaQuotes-Demo'
+        print(f'\nYou selected: {server}\n')
+    elif keyboard.is_pressed('2'):
+        server = 'OANDA-Demo-2'
+        print(f'\nYou selected: {server}\n')
+    elif keyboard.is_pressed('3'):
+        server = 'Hankotrade-Demo'
+        print(f'\nYou selected: {server}\n')
 
 # Login into mt5
-if not b.mt5_login(usr, password):
+if not b.mt5_login(usr, password, server):
     quit()
 b.thread_tick_reader()
 b.thread_slope_abs_rel()

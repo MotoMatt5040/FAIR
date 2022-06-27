@@ -92,7 +92,7 @@ class Bot:
         t.start()
         print('Thread - orders. LAUNCHED')
 
-    def mt5_login(self, usr: int, password: str) -> bool:
+    def mt5_login(self, usr: int, password: str, server: str) -> bool:
         """Function to initialize the metatrader 5 aplication
         and login with our account details.
 
@@ -109,7 +109,7 @@ class Bot:
             return False
 
         # Login into mt5
-        authorized = mt5.login(usr, password, server='MetaQuotes-Demo')
+        authorized = mt5.login(usr, server=server)
         if not authorized:
             print("failed to connect at account #{}, error code: {}".format(usr, mt5.last_error()))
             return False
