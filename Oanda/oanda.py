@@ -10,9 +10,15 @@ plt.style.use('seaborn')
 
 api = tpqoa.tpqoa("oanda.cfg")
 
-stocks = fi.FinancialInstrumentBase('AAPL', '2015-01-01', '2018-01-01')
-print(stocks)
-print(stocks.data)
+df = pd.read_csv('Materials/eurusd.csv', parse_dates=['Date'], index_col= 'Date')
+print(df.info())
+print(df)
+df.plot(figsize=(12, 8), title='EUR/USD', fontsize=12)
+plt.show()
+
+# stocks = fi.FinancialInstrumentBase('AAPL', '2015-01-01', '2018-01-01')
+# print(stocks)
+# print(stocks.data)
 
 # print(api.get_account_summary())
 #
