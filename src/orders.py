@@ -9,8 +9,8 @@ MARGIN = 10
 # TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
 TIME_BETWEEN_OPERATIONS = 10
 STOPLOSS = 20
-TAKEPROFIT = 100
-TRAIL_AMOUNT = 0.003 # 10 pips
+TAKEPROFIT = 20
+TRAIL_AMOUNT = 0.002 # 10 pips
 
 
 def handle_stoploss(order: int, position):

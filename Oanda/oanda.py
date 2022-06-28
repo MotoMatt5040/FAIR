@@ -4,12 +4,17 @@ from datetime import timedelta, date
 import tpqoa
 import yfinance as yf
 import matplotlib.pyplot as plt
+import FinancialInstruments as fi
 
 plt.style.use('seaborn')
 
 api = tpqoa.tpqoa("oanda.cfg")
 
-print(api.get_account_summary())
+stocks = fi.FinancialInstrumentBase('AAPL', '2015-01-01', '2018-01-01')
+print(stocks)
+print(stocks.data)
+
+# print(api.get_account_summary())
 #
 # ticker = ["AAPL", "BA", "KO", 'IBM', "DIS", 'MSFT']
 # stocks = yf.download(tickers=ticker, start=date.today() - timedelta(365), end=date.today())
