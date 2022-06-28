@@ -9,7 +9,7 @@ MARGIN = 10
 # TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
 TIME_BETWEEN_OPERATIONS = 10
 STOPLOSS = 20
-TAKEPROFIT = 20
+TAKEPROFIT = 100
 TRAIL_AMOUNT = 0.002 # 10 pips
 
 
@@ -34,6 +34,7 @@ def handle_stoploss(order: int, position):
         request = {
             "action": mt5.TRADE_ACTION_SLTP,
             "sl": sl,
+            "tp": 20,
             "position": ticket
         }
 
