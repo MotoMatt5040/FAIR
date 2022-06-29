@@ -11,11 +11,24 @@ plt.style.use('seaborn')
 api = tpqoa.tpqoa("oanda.cfg")
 
 df = pd.read_csv('Materials/eurusd.csv', parse_dates=['Date'], index_col= 'Date')
-print(df.info())
-print(df)
-df.plot(figsize=(12, 8), title='EUR/USD', fontsize=12)
-plt.show()
+# print(df.info())
+# print(df)
+# df.plot(figsize=(12, 8), title='EUR/USD', fontsize=12)
+# plt.show()
 
+df['returns'] = np.log(df.div(df.shift(1)))
+df['creturns'] = df.returns.cumsum().apply(np.exp)
+# print(df)
+
+df.dropna(inplace=True)
+print(f'{df}\n\n')
+print(f'Percent return: {df.returns.sum()}\n\n')  # sums returns percentage
+print(f'Actual dollar return: {np.exp(df.returns.sum())}\n\n')  # shows profit/loss of sums
+print(f'Yearly percent return: \n{df.returns.cumsum()}\n\n')  # shows yearly return percentage
+print(f'Yearly dollar returns: \n{df.returns.cumsum().apply(np.exp)}\n\n')  # Yearly dollar return value
+print(f'{df.describe()}\n\n')  # description of data in table such as std dev, mean, min, max, etc
+print(f'Annualized mean return: {df.returns.mean() * 252}') 
+print(f'Standard Deviation of returns: {df.returns.std() * np.sqrt(252)}\n\n')
 # stocks = fi.FinancialInstrumentBase('AAPL', '2015-01-01', '2018-01-01')
 # print(stocks)
 # print(stocks.data)
