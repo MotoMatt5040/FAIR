@@ -7,8 +7,8 @@ from itertools import product
 
 df = pd.read_csv('Materials/eurusd.csv', parse_dates=['Date'], index_col='Date')
 data = df.copy()
-sma_s = 46
-sma_l = 137
+sma_s = 50
+sma_l = 200
 
 # print(data.price.rolling(50))
 
@@ -56,7 +56,6 @@ plt.show()
 
 outperf = data.cstrategy.iloc[-1] - data.creturns.iloc[-1]
 print(f'Outperf: {outperf}\n\n')
-
 
 print(data)
 
