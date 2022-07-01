@@ -5,14 +5,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import product
 import SMABacktester as SMA
+import tpqoa
 
-tester = SMA.SMABacktester('EURUSD=X', 50, 200, '2004-01-01', '2020-06-30')
+# api = tpqoa.tpqoa('oanda.cfg')
 
+# df = api.get_history(instrument='EUR_USD', start='2022-06-29', end='2022-06-30', granularity='M5', price='B')
+# print(df)
+# close = df.c.to_frame()
+# print(close)
+
+# tester = SMA.SMABacktester('EURUSD=X', 50, 200, '2004-01-01', '2020-06-30')
+
+tester = SMA.SMABacktester(instrument='EUR_USD', start='2022-01-01', end='2022-06-30', granularity='M1', price='B', SMA_S=50, SMA_L=200)
 # print(tester.data)#.isna().sum() to count empty values
 
 print(tester.test_strategy())
 
-print(tester.optimize_parameters((10, 50, 1), (100, 252, 1)))
+print(tester.optimize_parameters((1, 50, 1), (51, 252, 1)))
 
 tester.plot_results()
 plt.show()
