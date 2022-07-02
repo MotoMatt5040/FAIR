@@ -16,17 +16,31 @@ import tpqoa
 
 # tester = SMA.SMABacktester('EURUSD=X', 50, 200, '2004-01-01', '2020-06-30')
 
-tester = SMA.SMABacktester(instrument='EUR_USD', start='2022-01-01', end='2022-06-30', granularity='M1', price='B', SMA_S=50, SMA_L=200)
+tester = SMA.SMABacktester(instrument='EUR_USD', start='2022-06-29', end='2022-06-30', granularity='M1', price='B', SMA_S=50, SMA_L=200)
 # print(tester.data)#.isna().sum() to count empty values
 
 print(tester.test_strategy())
 
-print(tester.optimize_parameters((1, 50, 1), (51, 252, 1)))
+print(tester.optimize_parameters((1, 252, 1), (1, 252, 1)))
+
+print(f'Absolute performance %: \n{tester.results[["returns", "strategy"]].sum()}\n\n')
+print(f'Absolute performance Actual $: \n{tester.results[["returns", "strategy"]].sum().apply(np.exp)}\n\n')
+print(f'Annualised return $: \n{tester.results[["returns", "strategy"]].mean() * 252}\n\n')
+print(f'Annualised risk $: \n{tester.results[["returns", "strategy"]].std() * np.sqrt(252)}\n\n')
+
+print("********************************************************\n\n")
+
+print(f'Absolute performance %: \n{tester.results[["creturns", "cstrategy"]].sum()}\n\n')
+print(f'Absolute performance Actual $: \n{tester.results[["creturns", "cstrategy"]].sum().apply(np.exp)}\n\n')
+print(f'Annualised return $: \n{tester.results[["creturns", "cstrategy"]].mean() * 252}\n\n')
+print(f'Annualised risk: \n{tester.results[["creturns", "cstrategy"]].std() * np.sqrt(252)}\n\n')
 
 tester.plot_results()
 plt.show()
 
 print(tester.results_overview)
+
+
 
 # OLD TESTING BELOW ###########################################################
 #
