@@ -124,3 +124,44 @@ print(data.pred.value_counts())
 print(hits)
 print(hit_ratio)
 
+data['strategy'] = data.pred * data.returns
+data['creturns'] = data['returns'].cumsum().apply(np.exp)
+data['cstrategy'] = data['strategy'].cumsum().apply(np.exp)
+
+data[['creturns', 'cstrategy']].plot(figsize=(12, 8))
+plt.show()
+
+data['trades'] = data.pred.diff().fillna(0).abs()
+print(data.trades.value_counts())
+
+# forward testing #####################################################################################################
+data = pd.read_csv('../Materials/test_set.csv', parse_dates=['time'], index_col='time')
+data['returns'] = np.log(data.div(data.shift(1)))
+
+lags = 5
+cols = []
+for lag in range(1, lags+1):
+    col = f'lag{lag}'
+    data[col] = data.returns.shift(lag)
+    cols.append(col)
+data.dropna(inplace=True)
+data['pred'] = lm.predict(data[cols].values)
+data.pred = np.sign(data.pred)
+hits = np.sign(data.returns * data.pred).value_counts()
+hit_ratio = hits[1.0] / sum(hits)
+print(data[:10].to_string())
+print(data.pred.value_counts())
+print(hits)
+print(hit_ratio)
+data['strategy'] = data.pred * data.returns
+data['creturns'] = data['returns'].cumsum().apply(np.exp)
+data['cstrategy'] = data['strategy'].cumsum().apply(np.exp)
+data[['creturns', 'cstrategy']].plot(figsize=(12, 8))
+plt.show()
+
+data['trades'] = data.pred.diff().fillna(0).abs()
+print(data.trades.value_counts())
+
+
+
+
