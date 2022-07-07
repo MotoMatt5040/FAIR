@@ -62,7 +62,7 @@ class IterativeBase():
         ''' Prints out the current (cash) balance.
         '''
         date, price, spread = self.get_values(bar)
-        print("{} | Current Balance: {}".format(date, round(self.current_balance, 2)))
+        print(f"{date} | Current Balance: { round(self.current_balance, 2)}")
 
     def buy_instrument(self, bar, units=None, amount=None):
         ''' Places and executes a buy order (market order).
@@ -75,7 +75,7 @@ class IterativeBase():
         self.current_balance -= units * price  # reduce cash balance by "purchase price"
         self.units += units
         self.trades += 1
-        print("{} |  Buying {} for {}".format(date, units, round(price, 5)))
+        print(f"{date} |  Buying {units} for {round(price, 5)}")
 
     def sell_instrument(self, bar, units=None, amount=None):
         ''' Places and executes a sell order (market order).
@@ -88,35 +88,35 @@ class IterativeBase():
         self.current_balance += units * price  # increases cash balance by "purchase price"
         self.units -= units
         self.trades += 1
-        print("{} |  Selling {} for {}".format(date, units, round(price, 5)))
+        print(f"{date} |  Selling {units} for {round(price, 5)}")
 
     def print_current_position_value(self, bar):
         ''' Prints out the current position value.
         '''
         date, price, spread = self.get_values(bar)
         cpv = self.units * price
-        print("{} |  Current Position Value = {}".format(date, round(cpv, 2)))
+        print(f"{date} |  Current Position Value = {round(cpv, 2)}")
 
     def print_current_nav(self, bar):
         ''' Prints out the current net asset value (nav).
         '''
         date, price, spread = self.get_values(bar)
         nav = self.current_balance + self.units * price
-        print("{} |  Net Asset Value = {}".format(date, round(nav, 2)))
+        print(f"{date} |  Net Asset Value = {round(nav, 2)}")
 
     def close_pos(self, bar):
         ''' Closes out a long or short position (go neutral).
         '''
         date, price, spread = self.get_values(bar)
         print(75 * "-")
-        print("{} | +++ CLOSING FINAL POSITION +++".format(date))
+        print(f"{date} | +++ CLOSING FINAL POSITION +++")
         self.current_balance += self.units * price  # closing final position (works with short and long!)
         self.current_balance -= (abs(self.units) * spread / 2 * self.use_spread)  # substract half-spread costs
-        print("{} | closing position of {} for {}".format(date, self.units, price))
+        print(f"{date} | closing position of {self.units} for {price}")
         self.units = 0  # setting position to neutral
         self.trades += 1
         perf = (self.current_balance - self.initial_balance) / self.initial_balance * 100
         self.print_current_balance(bar)
-        print("{} | net performance (%) = {}".format(date, round(perf, 2)))
-        print("{} | number of trades executed = {}".format(date, self.trades))
+        print(f"{date} | net performance (%) = {round(perf, 2)}")
+        print(f"{date} | number of trades executed = {self.trades}")
         print(75 * "-")

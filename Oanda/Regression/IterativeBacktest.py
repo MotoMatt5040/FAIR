@@ -40,7 +40,7 @@ class IterativeBacktest(IterativeBase):
         '''
 
         # nice printout
-        stm = "Testing SMA strategy | {} | SMA_S = {} & SMA_L = {}".format(self.symbol, SMA_S, SMA_L)
+        stm = f"Testing SMA strategy | {self.symbol} | SMA_S = {SMA_S} & SMA_L = {SMA_L}"
         print("-" * 75)
         print(stm)
         print("-" * 75)
@@ -79,7 +79,7 @@ class IterativeBacktest(IterativeBase):
         '''
 
         # nice printout
-        stm = "Testing Contrarian strategy | {} | Window = {}".format(self.symbol, window)
+        stm = f"Testing Contrarian strategy | {self.symbol} | Window = {window}"
         print("-" * 75)
         print(stm)
         print("-" * 75)
@@ -119,7 +119,7 @@ class IterativeBacktest(IterativeBase):
         '''
 
         # nice printout
-        stm = "Testing Bollinger Bands Strategy | {} | SMA = {} & dev = {}".format(self.symbol, SMA, dev)
+        stm = f"Testing Bollinger Bands Strategy | {self.symbol} | SMA = {SMA} & dev = {dev}"
         print("-" * 75)
         print(stm)
         print("-" * 75)
