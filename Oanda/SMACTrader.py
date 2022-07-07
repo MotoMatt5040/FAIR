@@ -5,9 +5,9 @@ from datetime import datetime, timedelta
 import time
 
 
-class ConTrader(tpqoa.tpqoa):
+class SMACTrader(tpqoa.tpqoa):
 
-    def __init__(self, config_file, instrument, bar_length, window, units):
+    def __init__(self, config_file, instrument, bar_length, smas, smal, units):
         super().__init__(config_file)
         self.instrument = instrument  # define instrument
         self.bar_length = pd.to_timedelta(bar_length)  # Pandas Timedelta Object
@@ -20,7 +20,8 @@ class ConTrader(tpqoa.tpqoa):
         self.profits = []
 
         # *****************add strategy-specific attributes here******************
-        self.window = window
+        self.smas = smas
+        self.smal = smal
         # ************************************************************************
 
     def get_most_recent(self, days=5):
@@ -56,7 +57,7 @@ class ConTrader(tpqoa.tpqoa):
             self.define_strategy()  # Prepare Data / Strategy Features
             self.execute_trades()
 
-    def resample_and_join(self):  
+    def resample_and_join(self):
         # self.data = self.tick_data.resample(self.bar_length, label = "right").last().ffill().iloc[:-1]
         #append the most recent ticks (resampled) to self.data
         # self.data = self.data.append(self.tick_data.resample(self.bar_length, label="right").last().ffill().iloc[:-1])
@@ -69,8 +70,9 @@ class ConTrader(tpqoa.tpqoa):
         df = self.raw_data.copy()  # self.raw_data new!
 
         # ******************** define your strategy here ************************
-        df["returns"] = np.log(df[self.instrument] / df[self.instrument].shift())
-        df["position"] = -np.sign(df.returns.rolling(self.window).mean())
+        df['SMAS'] = df[self.instrument].rolling(self.smas).mean()
+        df['SMAL'] = df[self.instrument].rolling(self.smal).mean()
+        df['position'] = np.where(df['SMAS'] > df['SMAL'], 1, -1)
         # ***********************************************************************
 
         self.data = df.copy()  # first defined here
@@ -79,29 +81,29 @@ class ConTrader(tpqoa.tpqoa):
         if self.data["position"].iloc[-1] == 1:
             if self.position == 0:
                 order = self.create_order(self.instrument, self.units, suppress=True, ret=True)
-                self.report_trade(order, "GOING LONG")  
+                self.report_trade(order, "GOING LONG")
             elif self.position == -1:
                 order = self.create_order(self.instrument, self.units * 2, suppress=True, ret=True)
-                self.report_trade(order, "GOING LONG")  
+                self.report_trade(order, "GOING LONG")
             self.position = 1
         elif self.data["position"].iloc[-1] == -1:
             if self.position == 0:
                 order = self.create_order(self.instrument, -self.units, suppress=True, ret=True)
-                self.report_trade(order, "GOING SHORT")  
+                self.report_trade(order, "GOING SHORT")
             elif self.position == 1:
                 order = self.create_order(self.instrument, -self.units * 2, suppress=True, ret=True)
-                self.report_trade(order, "GOING SHORT")  
+                self.report_trade(order, "GOING SHORT")
             self.position = -1
         elif self.data["position"].iloc[-1] == 0:
             if self.position == -1:
                 order = self.create_order(self.instrument, self.units, suppress=True, ret=True)
-                self.report_trade(order, "GOING NEUTRAL")  
+                self.report_trade(order, "GOING NEUTRAL")
             elif self.position == 1:
                 order = self.create_order(self.instrument, -self.units, suppress=True, ret=True)
-                self.report_trade(order, "GOING NEUTRAL")  
+                self.report_trade(order, "GOING NEUTRAL")
             self.position = 0
 
-    def report_trade(self, order, going):  
+    def report_trade(self, order, going):
         time = order["time"]
         units = order["units"]
         price = order["price"]
@@ -111,4 +113,4 @@ class ConTrader(tpqoa.tpqoa):
         print("\n" + 100 * "-")
         print("{} | {}".format(time, going))
         print("{} | units = {} | price = {} | P&L = {} | Cum P&L = {}".format(time, units, price, pl, cumpl))
-        print(100 * "-" + "\n")  
+        print(100 * "-" + "\n")

@@ -21,7 +21,7 @@ print(ml.results)
 # The optimal Number of Lags
 for lags in range(1, 21):
     print(lags, ml.test_strategy(train_ratio=0.7, lags=lags))
-ml.results.trades.value_counts()
+print(ml.results.trades.value_counts())
 
 # EURAUD
 symbol = "EURAUD"

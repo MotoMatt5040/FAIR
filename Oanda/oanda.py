@@ -7,22 +7,70 @@ import matplotlib.pyplot as plt
 import FinancialInstruments as fi
 import CloneClass as cc
 import ConTrader as ct
+import SMACTrader as st
+import BollTrader as bt
+import MLTrader as mt
+import pickle
+from sklearn.linear_model import LogisticRegression
+
+data = pd.read_csv("Materials/five_minute.csv", parse_dates=["time"], index_col="time")
+data["returns"] = np.log(data.div(data.shift(1)))
+data.dropna(inplace=True)
+data["direction"] = np.sign(data.returns)
+lags = 5
+cols = []
+for lag in range(1, lags + 1):
+    col = "lag{}".format(lag)
+    data[col] = data.returns.shift(lag)
+    cols.append(col)
+data.dropna(inplace=True)
+lm = LogisticRegression(C=1e6, max_iter=100000, multi_class="ovr")
+lm.fit(data[cols], data.direction)
+# data["pred"] = lm.predict(data[cols])
+# hits = np.sign(data.direction * data.pred).value_counts()
+# hit_ratio = hits[1.0] / sum(hits)
+pickle.dump(lm, open("logreg.pkl", "wb"))
 
 plt.style.use('seaborn')
 
-trader = ct.ConTrader("oanda.cfg", "EUR_USD", "1min", window=1, units=100000)
-print(datetime.utcnow())
-trader.get_most_recent()
-trader.stream_data(trader.instrument, stop=100)
-print(trader.position)
-print(trader.units)
-print(trader.get_positions())
+# trader = ct.ConTrader("oanda.cfg", "EUR_USD", "1min", window=1, units=100000)
+# trader = st.SMACTrader("oanda.cfg", "EUR_USD", "1min", smas=50, smal=200, units=100000)
+# trader = bt.BollTrader("oanda.cfg", "EUR_USD", "1min", sma=20, dev=1, units=100000)
 
+lm = pickle.load(open("logreg.pkl", "rb"))
+trader = mt.MLTrader("oanda.cfg", "EUR_USD", "5min", lags=5, model=lm, units=100000)
+
+trader.get_most_recent()
+trader.stream_data(trader.instrument, stop=200)
 if trader.position != 0:  # if we have a final open position
-    order = trader.create_order(trader.instrument, units=-trader.position * trader.units,
-                                suppress=True, ret=True)
+    close_order = trader.create_order(trader.instrument, units=-trader.position * trader.units,
+                                      suppress=True, ret=True)
+    trader.report_trade(close_order, "GOING NEUTRAL")
     trader.position = 0
-print(trader.data)
+# print(trader.data.tail(10))
+# print(trader.tick_data)
+
+pickle.dump(trader.model, open("logreg.pkl", "wb"))
+
+# SMA Plots
+# trader.data.plot(figsize=(12, 8), secondary_y="position")
+# plt.show()
+#
+# trader.data.tail(30).plot(figsize=(12, 8), secondary_y="position")
+# plt.show()
+
+# Bollinger Plots
+# trader.data[["EUR_USD", "SMA", "Lower", "Upper"]].plot(figsize=(12, 8))
+# plt.show()
+#
+# trader.data.tail(20)[["EUR_USD", "SMA", "Lower", "Upper"]].plot(figsize=(12, 8))
+# plt.show()
+
+# trader.get_positions()
+# print(trader.profits)
+# print(sum(trader.profits))
+# print(trader.data.tail(10))
+# print(trader.tick_data)
 
 # df = pd.read_csv('Materials/eurusd.csv', parse_dates=['Date'], index_col='Date')
 # # print(df.info())

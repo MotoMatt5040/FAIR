@@ -59,17 +59,6 @@ class SMABacktester:
         self.data = raw
         return raw
 
-    # def get_data(self):
-    #     """ Imports the data from forex_pairs.csv (source can be changed).
-    #     """
-    #     raw = pd.read_csv('Materials/forex_pairs.csv', parse_dates=['Date'], index_col='Date')
-    #     raw = raw[self.ticker].to_frame().dropna()
-    #     raw = raw.loc[self.start: self.end].copy()
-    #     raw.rename(columns={self.ticker: 'price'}, inplace=True)
-    #     raw['returns'] = np.log(raw / raw.shift(1))
-    #     self.data = raw
-    #     return raw
-
     def prepare_data(self):
         """Prepares the data for strategy backtesting (strategy-specific).
         """
@@ -77,7 +66,6 @@ class SMABacktester:
         data['SMA_S'] = data['price'].rolling(self._SMA_S).mean()
         data['SMA_L'] = data['price'].rolling(self._SMA_L).mean()
         self.data = data
-
 
     def set_parameters(self, SMA_S = None, SMA_L = None):
         """ Updates SMA parameters and the prepared dataset.
