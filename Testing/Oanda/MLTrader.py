@@ -7,9 +7,10 @@ import time
 import pickle
 
 
+
 class MLTrader(tpqoa.tpqoa):
 
-    def __init__(self, config_file, instrument, bar_length, model, lags, granularity, units):
+    def __init__(self, config_file, instrument, bar_length, lags, model, units):
         super().__init__(config_file)
         self.instrument = instrument  # define instrument
         self.bar_length = pd.to_timedelta(bar_length)  # Pandas Timedelta Object
@@ -22,9 +23,8 @@ class MLTrader(tpqoa.tpqoa):
         self.profits = []
 
         # *****************add strategy-specific attributes here******************
-        self.model = model
         self.lags = lags
-        self.granularity = granularity
+        self.model = model
         # ************************************************************************
 
     def get_most_recent(self, days=5):
@@ -34,7 +34,7 @@ class MLTrader(tpqoa.tpqoa):
             now = now - timedelta(microseconds=now.microsecond)
             past = now - timedelta(days=days)
             df = self.get_history(instrument=self.instrument, start=past, end=now,
-                                  granularity=self.granularity, price="M", localize=False).c.dropna().to_frame()
+                                  granularity="S5", price="M", localize=False).c.dropna().to_frame()
             df.rename(columns={"c": self.instrument}, inplace=True)
             df = df.resample(self.bar_length, label="right").last().dropna().iloc[:-1]
             self.raw_data = df.copy()  # first defined
@@ -50,8 +50,8 @@ class MLTrader(tpqoa.tpqoa):
         # collect and store tick data
         recent_tick = pd.to_datetime(time)  # Pandas Timestamp Object
 
-        # if recent_tick.time() >= pd.to_datetime('8:15').time():
-        #     self.stop_stream = True
+        if recent_tick.time() >= pd.to_datetime('8:35').time():
+            self.stop_stream = True
 
         df = pd.DataFrame({self.instrument: (ask + bid) / 2},
                           index=[pd.to_datetime(time)])  # mid price only

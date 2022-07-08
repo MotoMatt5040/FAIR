@@ -8,7 +8,6 @@ import time
 import keyboard
 
 import bot
-import matplotlib.pyplot as plt
 
 logging.basicConfig(level=logging.DEBUG)
 logging.root.setLevel(logging.DEBUG)

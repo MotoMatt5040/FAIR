@@ -1,7 +1,7 @@
 import sys
 import MetaTrader5 as mt5
-sys.path.append('../')
-import src.MACD as MACD, src.RSI as RSI, src.slope_abs_rel as slope_abs_rel, src.statistic as st
+sys.path.append('../../')
+import Testing.src.MACD as MACD, Testing.src.RSI as RSI, Testing.src.slope_abs_rel as slope_abs_rel, Testing.src.statistic as st
 
 # File to load and save
 FILENAME = sys.argv[1]

@@ -1,15 +1,13 @@
 import pandas as pd
 import numpy as np
-# from sklearn.linear_model import LogisticRegression
 import tpqoa
 from datetime import datetime, timedelta
 import time
-import pickle
 
 
-class MLTrader(tpqoa.tpqoa):
+class ConTrader(tpqoa.tpqoa):
 
-    def __init__(self, config_file, instrument, bar_length, model, lags, granularity, units):
+    def __init__(self, config_file, instrument, bar_length, window, units):
         super().__init__(config_file)
         self.instrument = instrument  # define instrument
         self.bar_length = pd.to_timedelta(bar_length)  # Pandas Timedelta Object
@@ -22,9 +20,7 @@ class MLTrader(tpqoa.tpqoa):
         self.profits = []
 
         # *****************add strategy-specific attributes here******************
-        self.model = model
-        self.lags = lags
-        self.granularity = granularity
+        self.window = window
         # ************************************************************************
 
     def get_most_recent(self, days=5):
@@ -34,7 +30,7 @@ class MLTrader(tpqoa.tpqoa):
             now = now - timedelta(microseconds=now.microsecond)
             past = now - timedelta(days=days)
             df = self.get_history(instrument=self.instrument, start=past, end=now,
-                                  granularity=self.granularity, price="M", localize=False).c.dropna().to_frame()
+                                  granularity="S5", price="M", localize=False).c.dropna().to_frame()
             df.rename(columns={"c": self.instrument}, inplace=True)
             df = df.resample(self.bar_length, label="right").last().dropna().iloc[:-1]
             self.raw_data = df.copy()  # first defined
@@ -49,10 +45,6 @@ class MLTrader(tpqoa.tpqoa):
 
         # collect and store tick data
         recent_tick = pd.to_datetime(time)  # Pandas Timestamp Object
-
-        # if recent_tick.time() >= pd.to_datetime('8:15').time():
-        #     self.stop_stream = True
-
         df = pd.DataFrame({self.instrument: (ask + bid) / 2},
                           index=[pd.to_datetime(time)])  # mid price only
         # self.tick_data = self.tick_data.append(df)  # old method to append is not supported, use concat
@@ -64,7 +56,7 @@ class MLTrader(tpqoa.tpqoa):
             self.define_strategy()  # Prepare Data / Strategy Features
             self.execute_trades()
 
-    def resample_and_join(self):
+    def resample_and_join(self):  
         # self.data = self.tick_data.resample(self.bar_length, label = "right").last().ffill().iloc[:-1]
         #append the most recent ticks (resampled) to self.data
         # self.data = self.data.append(self.tick_data.resample(self.bar_length, label="right").last().ffill().iloc[:-1])
@@ -77,15 +69,8 @@ class MLTrader(tpqoa.tpqoa):
         df = self.raw_data.copy()  # self.raw_data new!
 
         # ******************** define your strategy here ************************
-        df = pd.concat([df, self.tick_data])  # append latest tick (== open price of current bar)
         df["returns"] = np.log(df[self.instrument] / df[self.instrument].shift())
-        cols = []
-        for lag in range(1, self.lags + 1):
-            col = "lag{}".format(lag)
-            df[col] = df.returns.shift(lag)
-            cols.append(col)
-        df.dropna(inplace=True)
-        df["position"] = self.model.predict(df[cols])
+        df["position"] = -np.sign(df.returns.rolling(self.window).mean())
         # ***********************************************************************
 
         self.data = df.copy()  # first defined here
@@ -94,29 +79,29 @@ class MLTrader(tpqoa.tpqoa):
         if self.data["position"].iloc[-1] == 1:
             if self.position == 0:
                 order = self.create_order(self.instrument, self.units, suppress=True, ret=True)
-                self.report_trade(order, "GOING LONG")
+                self.report_trade(order, "GOING LONG")  
             elif self.position == -1:
                 order = self.create_order(self.instrument, self.units * 2, suppress=True, ret=True)
-                self.report_trade(order, "GOING LONG")
+                self.report_trade(order, "GOING LONG")  
             self.position = 1
         elif self.data["position"].iloc[-1] == -1:
             if self.position == 0:
                 order = self.create_order(self.instrument, -self.units, suppress=True, ret=True)
-                self.report_trade(order, "GOING SHORT")
+                self.report_trade(order, "GOING SHORT")  
             elif self.position == 1:
                 order = self.create_order(self.instrument, -self.units * 2, suppress=True, ret=True)
-                self.report_trade(order, "GOING SHORT")
+                self.report_trade(order, "GOING SHORT")  
             self.position = -1
         elif self.data["position"].iloc[-1] == 0:
             if self.position == -1:
                 order = self.create_order(self.instrument, self.units, suppress=True, ret=True)
-                self.report_trade(order, "GOING NEUTRAL")
+                self.report_trade(order, "GOING NEUTRAL")  
             elif self.position == 1:
                 order = self.create_order(self.instrument, -self.units, suppress=True, ret=True)
-                self.report_trade(order, "GOING NEUTRAL")
+                self.report_trade(order, "GOING NEUTRAL")  
             self.position = 0
 
-    def report_trade(self, order, going):
+    def report_trade(self, order, going):  
         time = order["time"]
         units = order["units"]
         price = order["price"]
@@ -126,4 +111,4 @@ class MLTrader(tpqoa.tpqoa):
         print("\n" + 100 * "-")
         print("{} | {}".format(time, going))
         print("{} | units = {} | price = {} | P&L = {} | Cum P&L = {}".format(time, units, price, pl, cumpl))
-        print(100 * "-" + "\n")
+        print(100 * "-" + "\n")  

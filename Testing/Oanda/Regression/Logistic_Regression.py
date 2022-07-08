@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import accuracy_score
+import tpqoa
+from datetime import datetime, timedelta, date
 
 plt.style.use('seaborn')
 # lm = LinearRegression(fit_intercept= True)
@@ -50,9 +52,14 @@ lm = LogisticRegression()
 # plt.ylabel("Pass/Fail", fontsize=15)
 # plt.show()
 
+api = tpqoa.tpqoa('../oanda.cfg')
+
+data = api.get_history(instrument="EUR_USD", start=str(date.today() - timedelta(30)), end=str(date.today()),
+                       granularity="M1", price="B")
+
 print(f'\n********************************Backtesting********************************\n')
-data = pd.read_csv("../Materials/five_minute.csv", parse_dates=["time"], index_col="time")
-data["returns"] = np.log(data.div(data.shift(1)))
+# data = pd.read_csv("../Materials/five_minute.csv", parse_dates=["time"], index_col="time")
+data["returns"] = np.log(data.c.div(data.c.shift(1)))
 data.dropna(inplace=True)
 data["direction"] = np.sign(data.returns)
 
@@ -89,9 +96,13 @@ print(data.trades.value_counts())
 
 # Out-Sample forward testing
 print(f'\n********************************Forward Testing********************************\n')
-data = pd.read_csv("../Materials/test_set.csv", parse_dates=["time"], index_col="time")
+# data = pd.read_csv("../Materials/test_set.csv", parse_dates=["time"], index_col="time")
 
-data["returns"] = np.log(data.div(data.shift(1)))
+data = api.get_history(instrument="EUR_USD", start=str(date.today() - timedelta(30)), end=str(date.today()),
+                       granularity="M1", price="B")
+
+
+data["returns"] = np.log(data.c.div(data.c.shift(1)))
 data["direction"] = np.sign(data.returns)
 lags = 5
 cols = []

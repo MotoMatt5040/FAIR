@@ -44,7 +44,7 @@ class MeanRevBacktester():
     def get_data(self):
         ''' Imports the data from intraday_pairs.csv (source can be changed).
         '''
-        raw = pd.read_csv("intraday_pairs.csv", parse_dates = ["time"], index_col = "time")
+        raw = pd.read_csv("intraday_pairs.csv", parse_dates = ["time"], index_col ="time")
         raw = raw[self.symbol].to_frame().dropna()
         raw = raw.loc[self.start:self.end]
         raw.rename(columns={self.symbol: "price"}, inplace=True)

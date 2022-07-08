@@ -40,7 +40,7 @@ class SMABacktester():
     def get_data(self):
         ''' Imports the data from forex_pairs.csv (source can be changed).
         '''
-        raw = pd.read_csv("forex_pairs.csv", parse_dates = ["Date"], index_col = "Date")
+        raw = pd.read_csv("forex_pairs.csv", parse_dates = ["Date"], index_col ="Date")
         raw = raw[self.symbol].to_frame().dropna()
         raw = raw.loc[self.start:self.end].copy()
         raw.rename(columns={self.symbol: "price"}, inplace=True)

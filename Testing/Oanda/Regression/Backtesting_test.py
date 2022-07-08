@@ -4,7 +4,7 @@ from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 
 plt.style.use("seaborn")
-df = pd.read_csv("../Materials/five_minute_pairs.csv", parse_dates=["time"], index_col="time")
+# df = pd.read_csv("../Materials/five_minute_pairs.csv", parse_dates=["time"], index_col="time")
 import MLBacktester as MLB
 
 # EURUSD

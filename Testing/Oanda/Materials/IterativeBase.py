@@ -37,7 +37,7 @@ class IterativeBase():
     def get_data(self):
         ''' Imports the data from detailed.csv (source can be changed).
         '''
-        raw = pd.read_csv("detailed.csv", parse_dates = ["time"], index_col = "time").dropna()
+        raw = pd.read_csv("detailed.csv", parse_dates = ["time"], index_col ="time").dropna()
         raw = raw.loc[self.start:self.end].copy()
         raw["returns"] = np.log(raw.price / raw.price.shift(1))
         self.data = raw
