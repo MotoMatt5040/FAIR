@@ -50,8 +50,8 @@ class MLTrader(tpqoa.tpqoa):
         # collect and store tick data
         recent_tick = pd.to_datetime(time)  # Pandas Timestamp Object
 
-        if recent_tick.time() >= pd.to_datetime('8:35').time():
-            self.stop_stream = True
+        # if recent_tick.time() >= pd.to_datetime('8:35').time():
+        #     self.stop_stream = True
 
         df = pd.DataFrame({self.instrument: (ask + bid) / 2},
                           index=[pd.to_datetime(time)])  # mid price only

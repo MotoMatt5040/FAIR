@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import product
 import tpqoa
+from datetime import date, timedelta
 plt.style.use('seaborn')
 
 # df = pd.read_csv('Materials/forex_pairs.csv', parse_dates=['Date'], index_col='Date')
@@ -129,3 +130,9 @@ class SMABacktester:
         self.results_overview = many_results
 
         return opt, best_perf
+
+tester = SMABacktester(instrument='EUR_USD', start=str(date.today() - timedelta(365)), end=str(date.today()), granularity='M1', price='B', SMA_S=50, SMA_L=200)
+
+print(tester.test_strategy())
+
+print(tester.optimize_parameters((1, 252, 1), (1, 252, 1)))

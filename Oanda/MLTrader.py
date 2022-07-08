@@ -24,7 +24,7 @@ class MLTrader(tpqoa.tpqoa):
         # *****************add strategy-specific attributes here******************
         self.model = model
         self.lags = lags
-        self.granularity = granularity
+        self.gran = granularity
         # ************************************************************************
 
     def get_most_recent(self, days=5):
@@ -34,7 +34,7 @@ class MLTrader(tpqoa.tpqoa):
             now = now - timedelta(microseconds=now.microsecond)
             past = now - timedelta(days=days)
             df = self.get_history(instrument=self.instrument, start=past, end=now,
-                                  granularity=self.granularity, price="M", localize=False).c.dropna().to_frame()
+                                  granularity=self.gran, price="M", localize=False).c.dropna().to_frame()
             df.rename(columns={"c": self.instrument}, inplace=True)
             df = df.resample(self.bar_length, label="right").last().dropna().iloc[:-1]
             self.raw_data = df.copy()  # first defined
