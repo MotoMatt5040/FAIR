@@ -1,3 +1,9 @@
+# Disclaimer:
+# The following illustrative example is for general information and educational purposes only.
+# It is neither investment advice nor a recommendation to trade, invest or take whatsoever actions.
+# The below code should only be used in combination with an Oanda Practice/Demo Account and NOT with a Live Trading Account.
+
+
 import pandas as pd
 import numpy as np
 import tpqoa
@@ -5,12 +11,11 @@ from datetime import datetime, timedelta
 import time
 
 
-class SMACTrader(tpqoa.tpqoa):
-
-    def __init__(self, config_file, instrument, bar_length, smas, smal, units):
-        super().__init__(config_file)
-        self.instrument = instrument  # define instrument
-        self.bar_length = pd.to_timedelta(bar_length)  # Pandas Timedelta Object
+class ConTrader(tpqoa.tpqoa):
+    def __init__(self, conf_file, instrument, bar_length, window, units):
+        super().__init__(conf_file)
+        self.instrument = instrument
+        self.bar_length = pd.to_timedelta(bar_length)
         self.tick_data = pd.DataFrame()
         self.raw_data = None
         self.data = None
@@ -20,8 +25,7 @@ class SMACTrader(tpqoa.tpqoa):
         self.profits = []
 
         # *****************add strategy-specific attributes here******************
-        self.smas = smas
-        self.smal = smal
+        self.window = window
         # ************************************************************************
 
     def get_most_recent(self, days=5):
@@ -34,56 +38,39 @@ class SMACTrader(tpqoa.tpqoa):
                                   granularity="S5", price="M", localize=False).c.dropna().to_frame()
             df.rename(columns={"c": self.instrument}, inplace=True)
             df = df.resample(self.bar_length, label="right").last().dropna().iloc[:-1]
-            self.raw_data = df.copy()  # first defined
-            self.last_bar = self.raw_data.index[-1]  # first defined
-
-            # accept, if less than [bar_length] has elapsed since the last full historical bar and now
+            self.raw_data = df.copy()
+            self.last_bar = self.raw_data.index[-1]
             if pd.to_datetime(datetime.utcnow()).tz_localize("UTC") - self.last_bar < self.bar_length:
                 break
 
     def on_success(self, time, bid, ask):
-        print(self.ticks, end=" ", flush=True)  # Print running Tick number
+        print(self.ticks, end=" ", flush=True)
 
-        # collect and store tick data
-        recent_tick = pd.to_datetime(time)  # Pandas Timestamp Object
-        # print(recent_tick, pd.to_datetime('8:05').time())
-
-        if recent_tick.time() <= pd.to_datetime('11:05').time() and recent_tick.time() >= pd.to_datetime('21:55').time():
-            print(recent_tick, pd.to_datetime('8:00').time())
-            self.stop_stream = True
-            time.sleep(300)
-
-
+        recent_tick = pd.to_datetime(time)
         df = pd.DataFrame({self.instrument: (ask + bid) / 2},
-                          index=[pd.to_datetime(time)])  # mid price only
-        # self.tick_data = self.tick_data.append(df)  # old method to append is not supported, use concat
-        self.tick_data = pd.concat([self.tick_data, df])  # new method to append to df
+                          index=[recent_tick])
+        self.tick_data = self.tick_data.append(df)
 
-        # if a time longer than the bar_length has elapsed between last full bar and the most recent tick
         if recent_tick - self.last_bar > self.bar_length:
             self.resample_and_join()
-            self.define_strategy()  # Prepare Data / Strategy Features
+            self.define_strategy()
             self.execute_trades()
 
     def resample_and_join(self):
-        # self.data = self.tick_data.resample(self.bar_length, label = "right").last().ffill().iloc[:-1]
-        #append the most recent ticks (resampled) to self.data
-        # self.data = self.data.append(self.tick_data.resample(self.bar_length, label="right").last().ffill().iloc[:-1])
-        self.raw_data = pd.concat([self.raw_data, self.tick_data.resample(
-            self.bar_length, label="right").last().ffill().iloc[:-1]])
-        self.tick_data = self.tick_data.iloc[-1:]  # only keep the latest tick (next bar)
+        self.raw_data = self.raw_data.append(self.tick_data.resample(self.bar_length,
+                                                                     label="right").last().ffill().iloc[:-1])
+        self.tick_data = self.tick_data.iloc[-1:]
         self.last_bar = self.raw_data.index[-1]
 
     def define_strategy(self):  # "strategy-specific"
-        df = self.raw_data.copy()  # self.raw_data new!
+        df = self.raw_data.copy()
 
         # ******************** define your strategy here ************************
-        df['SMAS'] = df[self.instrument].rolling(self.smas).mean()
-        df['SMAL'] = df[self.instrument].rolling(self.smal).mean()
-        df['position'] = np.where(df['SMAS'] > df['SMAL'], 1, -1)
+        df["returns"] = np.log(df[self.instrument] / df[self.instrument].shift())
+        df["position"] = -np.sign(df.returns.rolling(self.window).mean())
         # ***********************************************************************
 
-        self.data = df.copy()  # first defined here
+        self.data = df.copy()
 
     def execute_trades(self):
         if self.data["position"].iloc[-1] == 1:
@@ -123,5 +110,15 @@ class SMACTrader(tpqoa.tpqoa):
         print("{} | units = {} | price = {} | P&L = {} | Cum P&L = {}".format(time, units, price, pl, cumpl))
         print(100 * "-" + "\n")
 
-    #  def reset_parameters(self):
 
+if __name__ == "__main__":
+
+    trader = ConTrader(r"C:\Users\hagma\OneDrive\Desktop\Part4_Materials\Oanda\oanda.cfg", "EUR_USD", "1min", window=1,
+                       units=100000)
+    trader.get_most_recent()
+    trader.stream_data(trader.instrument, stop=100)
+    if trader.position != 0:
+        close_order = trader.create_order(trader.instrument, units=-trader.position * trader.units,
+                                          suppress=True, ret=True)
+        trader.report_trade(close_order, "GOING NEUTRAL")
+        trader.position = 0

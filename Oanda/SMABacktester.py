@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from itertools import product
 import tpqoa
 from datetime import date, timedelta
+import keyboard
+import pickle
 plt.style.use('seaborn')
 
 # df = pd.read_csv('Materials/forex_pairs.csv', parse_dates=['Date'], index_col='Date')
@@ -99,6 +101,7 @@ class SMABacktester:
         else:
             title = f'{self._instrument} | {self._SMA_S} | SMA_S | {self._SMA_L} | SMA_L'
             self.results[['creturns', 'cstrategy']].plot(title=title, figsize=(12, 8))
+            plt.show()
 
     def optimize_parameters(self, SMA_S_range, SMA_L_range):
         """ Finds the optimal strategy (global maximum) given the SMA parameter ranges.
@@ -129,10 +132,21 @@ class SMABacktester:
         many_results['performance'] = results
         self.results_overview = many_results
 
+        pickle.dump(opt, open("sma_update.pkl", "wb"))
+
         return opt, best_perf
 
-tester = SMABacktester(instrument='EUR_USD', start=str(date.today() - timedelta(365)), end=str(date.today()), granularity='M1', price='B', SMA_S=50, SMA_L=200)
+if __name__ == '__main__':
+    tester = SMABacktester(instrument='EUR_USD', start=str(date.today() - timedelta(1)), end=str(date.today()), granularity='M1', price='B', SMA_S=37, SMA_L=1)
 
-print(tester.test_strategy())
+    print(tester.test_strategy())
+    # tester.plot_results()
 
-print(tester.optimize_parameters((1, 252, 1), (1, 252, 1)))
+    print(tester.optimize_parameters((1, 170, 1), (1, 170, 1))[0])
+
+    wait = True
+    while wait:
+        if keyboard.is_pressed('1'):
+            wait = False
+    # tester.plot_results()
+
