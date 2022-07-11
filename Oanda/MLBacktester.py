@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 import tpqoa
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import pickle
 
 plt.style.use("seaborn")
@@ -135,13 +135,13 @@ class MLBacktester():
             self.results[["creturns", "cstrategy"]].plot(title=title, figsize=(12, 8))
 
 
-ml = MLBacktester(symbol='EUR_USD', start=str(date.today() - timedelta(365)), end=str(date.today()), tc=0.0, granularity='M5')
+ml = MLBacktester(symbol='EUR_USD', start=str(datetime.now() - timedelta(hours=3))[:-7], end=str(datetime.now())[:-7], tc=0.0, granularity='M5')
 
 
 # The optimal Number of Lags
 results = 0.0
 best = 0
-for lags in range(1, 50):
+for lags in range(1, 11):
     perf = ml.test_strategy(train_ratio=0.7, lags=lags)[0]
     print(f'Lags: {lags} | Peformance {perf}')
     if perf > results:

@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import product
 import tpqoa
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import keyboard
 import pickle
 plt.style.use('seaborn')
@@ -137,12 +137,14 @@ class SMABacktester:
         return opt, best_perf
 
 if __name__ == '__main__':
-    tester = SMABacktester(instrument='EUR_USD', start=str(date.today() - timedelta(1)), end=str(date.today()), granularity='M1', price='B', SMA_S=37, SMA_L=1)
+    tester = SMABacktester(instrument='EUR_USD', start=str(datetime.now() - timedelta(days=1))[:-7],
+                           end=str(datetime.now())[:-7], granularity='M5', price='B', SMA_S=37, SMA_L=1)
+
 
     print(tester.test_strategy())
     # tester.plot_results()
 
-    print(tester.optimize_parameters((1, 50, 1), (51, 252, 1))[0])
+    print(tester.optimize_parameters((1, 50, 1), (51, 170, 1))[0])
 
     wait = True
     while wait:

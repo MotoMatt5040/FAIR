@@ -2,15 +2,18 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import product
+from datetime import date, timedelta, datetime
+import tpqoa
 
 plt.style.use("seaborn")
+api = tpqoa.tpqoa('oanda.cfg')
 
 
 class MeanRevBacktester():
     ''' Class for the vectorized backtesting of Bollinger Bands-based trading strategies.
     '''
 
-    def __init__(self, symbol, SMA, dev, start, end, tc, investment):
+    def __init__(self, instrument, start, end, granularity, price, SMA, dev, tc):
         '''
         Parameters
         ----------
@@ -27,31 +30,37 @@ class MeanRevBacktester():
         tc: float
             proportional transaction/trading costs per trade
         '''
-        self.symbol = symbol
-        self.SMA = SMA
-        self.dev = dev
+        # self.ticker = ticker
+        self._instrument = instrument
+        self.price = price
+        self.granularity = granularity
         self.start = start
         self.end = end
-        self.tc = tc
         self.results = None
+        self.SMA = SMA
+        self.dev = dev
+        self.tc = tc
+
         self.get_data()
         self.prepare_data()
-        self.investment = investment
 
     def __repr__(self):
         rep = "MeanRevBacktester(symbol = {}, SMA = {}, dev = {}, start = {}, end = {})"
-        return rep.format(self.symbol, self.SMA, self.dev, self.start, self.end)
+        return rep.format(self._instrument, self.SMA, self.dev, self.start, self.end)
 
     def get_data(self):
         ''' Imports the data from intraday_pairs.csv (source can be changed).
         '''
-        raw = pd.read_csv("../Testing/Oanda/Materials/intraday_pairs.csv", parse_dates=["time"], index_col="time")
-        raw = raw[self.symbol].to_frame().dropna()
-        raw = raw.loc[self.start:self.end]
-        raw.rename(columns={self.symbol: "price"}, inplace=True)
-        raw["returns"] = np.log(raw / raw.shift(1))
-        print(raw)
+        # raw = pd.read_csv("../Testing/Oanda/Materials/intraday_pairs.csv", parse_dates=["time"], index_col="time")
+        raw = api.get_history(instrument=self._instrument, start=self.start, end=self.end, granularity=self.granularity,
+                              price=self.price)
+        raw = raw.c.to_frame().dropna()
+        raw = raw.loc[self.start: self.end].copy()
+        raw.rename(columns={'c': 'price'}, inplace=True)
+        raw['returns'] = np.log(raw / raw.shift(1))
         self.data = raw
+        print(raw)
+        return raw
 
     def prepare_data(self):
         '''Prepares the data for strategy backtesting (strategy-specific).
@@ -101,7 +110,7 @@ class MeanRevBacktester():
         perf = data["cstrategy"].iloc[-1]  # absolute performance of the strategy
         outperf = perf - data["creturns"].iloc[-1]  # out-/underperformance of strategy
 
-        return round(perf, 6), round(outperf, 6), round(perf * self.investment, 6)
+        return round(perf, 6), round(outperf, 6)
 
     def plot_results(self):
         ''' Plots the performance of the trading strategy and compares to "buy and hold".
@@ -109,7 +118,7 @@ class MeanRevBacktester():
         if self.results is None:
             print("Run test_strategy() first.")
         else:
-            title = "{} | SMA = {} | dev = {} | TC = {}".format(self.symbol, self.SMA, self.dev, self.tc)
+            title = "{} | SMA = {} | dev = {} | TC = {}".format(self._instrument, self.SMA, self.dev, self.tc)
             self.results[["creturns", "cstrategy"]].plot(title=title, figsize=(12, 8))
             plt.show()
 
@@ -123,6 +132,7 @@ class MeanRevBacktester():
         '''
 
         combinations = list(product(range(*SMA_range), range(*dev_range)))
+        print(f'{len(combinations)} strategies being tested')
 
         # test all combinations
         results = []
@@ -145,8 +155,11 @@ class MeanRevBacktester():
         return opt, best_perf
 
 
-mr = MeanRevBacktester('EURUSD', 30, 2, '2018-01-01', '2019-12-30', 0.000, 100000.0)
+# mr = MeanRevBacktester('EURUSD', 30, 2, '2018-01-01', '2019-12-30', 0.000, 100000.0)
 
-print(mr.optimize_parameters((10, 70, 1), (1, 5, 1)))
+mr = MeanRevBacktester(instrument='EUR_USD', start=str(datetime.now() - timedelta(days=365))[:-7], end=str(datetime.now())[:-7],
+                                granularity='M1', price='B', SMA=30, dev=1, tc=0.0)
+
+# print(mr.optimize_parameters((1, 70, 1), (1, 5, 1)))
 print(mr.test_strategy())
 mr.plot_results()

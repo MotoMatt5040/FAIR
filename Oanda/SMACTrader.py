@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import time
 
 
-class SMACBOLLTrader(tpqoa.tpqoa):
+class SMACTrader(tpqoa.tpqoa):
 
     def __init__(self, config_file, instrument, bar_length, smas, smal, units):
         super().__init__(config_file)
@@ -31,7 +31,7 @@ class SMACBOLLTrader(tpqoa.tpqoa):
             now = now - timedelta(microseconds=now.microsecond)
             past = now - timedelta(days=days)
             df = self.get_history(instrument=self.instrument, start=past, end=now,
-                                  granularity="S5", price="M", localize=False).c.dropna().to_frame()
+                                  granularity="M1", price="M", localize=False).c.dropna().to_frame()
             df.rename(columns={"c": self.instrument}, inplace=True)
             df = df.resample(self.bar_length, label="right").last().dropna().iloc[:-1]
             self.raw_data = df.copy()  # first defined
@@ -95,26 +95,26 @@ class SMACBOLLTrader(tpqoa.tpqoa):
     def execute_trades(self):
         if self.data["position"].iloc[-1] == 1:
             if self.position == 0:
-                order = self.create_order(self.instrument, self.units, suppress=True, ret=True, tsl_distance=0.005)
+                order = self.create_order(self.instrument, self.units, suppress=True, ret=True, tsl_distance=.0003)
                 self.report_trade(order, "GOING LONG")
             elif self.position == -1:
-                order = self.create_order(self.instrument, self.units * 2, suppress=True, ret=True, tsl_distance=0.005)
+                order = self.create_order(self.instrument, self.units * 2, suppress=True, ret=True, tsl_distance=.0003)
                 self.report_trade(order, "GOING LONG")
             self.position = 1
         elif self.data["position"].iloc[-1] == -1:
             if self.position == 0:
-                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True, tsl_distance=-0.005)
+                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True, tsl_distance=.0003)
                 self.report_trade(order, "GOING SHORT")
             elif self.position == 1:
-                order = self.create_order(self.instrument, -self.units * 2, suppress=True, ret=True, tsl_distance=-0.005)
+                order = self.create_order(self.instrument, -self.units * 2, suppress=True, ret=True, tsl_distance=.0003)
                 self.report_trade(order, "GOING SHORT")
             self.position = -1
         elif self.data["position"].iloc[-1] == 0:
             if self.position == -1:
-                order = self.create_order(self.instrument, self.units, suppress=True, ret=True)
+                order = self.create_order(self.instrument, self.units, suppress=True, ret=True, tsl_distance=.0003)
                 self.report_trade(order, "GOING NEUTRAL")
             elif self.position == 1:
-                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True)
+                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True, tsl_distance=.0003)
                 self.report_trade(order, "GOING NEUTRAL")
             self.position = 0
 

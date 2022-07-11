@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from itertools import product
 import tpqoa
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import keyboard
 import pickle
 import yfinance as yf
@@ -98,7 +98,7 @@ class StachBacktester:
         # Uses the %k to calculates a SMA over the past 3 values of %k
         data['d'] = data['k'].rolling(self.d_period).mean()
 
-        data.ta.stoch(high='high', low='low', k=14, d=3, append=True)
+        data.ta.stoch(high='high', low='low', k=self.k_period, d=self.d_period, append=True)
         data.dropna(inplace=True)
         # print(data.head(10).to_string())
 
@@ -111,6 +111,7 @@ class StachBacktester:
         data['position'] = np.where((data['k'] < 20.0) & (data['d'] < 20.0) & (data['k'] > data['d']), 1, np.nan)
         data["position"] = data.position.ffill().fillna(0)
         data['strategy'] = data['position'].shift(1) * data['returns']
+
 
         data.dropna(inplace=True)
 
@@ -149,6 +150,7 @@ class StachBacktester:
         for comb in combinations:
             self.set_parameters(comb[0], comb[1])
             results.append(self.test_strategy()[0])
+        print(self.results.head(10).to_string())
 
         best_perf = np.max(results)  # best performance
         opt = combinations[np.argmax(results)]  # optimal parameters
@@ -168,8 +170,8 @@ class StachBacktester:
 
 
 if __name__ == '__main__':
-    tester = StachBacktester(instrument='EUR_USD', start=str(date.today() - timedelta(1)), end=str(date.today()),
-                             granularity='M1', price='B', k_period=14, d_period=3)
+    tester = StachBacktester(instrument='EUR_USD', start=str(datetime.now() - timedelta(days=19))[:-7],
+                           end=str(datetime.now())[:-7], granularity='M5', price='B', k_period=14, d_period=3)
 
     print(tester.test_strategy())
     tester.plot_results()

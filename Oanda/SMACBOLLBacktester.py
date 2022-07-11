@@ -105,15 +105,19 @@ class SMACBOLLBacktester:
         data['strategy'] = data['sposition'].shift(1) * data['returns']
 
         data["distance"] = data.price - data.SMA
-        data["bposition"] = np.where(data.price < data.Lower, 1, np.nan)
-        data["bposition"] = np.where(data.price > data.Upper, -1, data["bposition"])
+        data["bposition"] = np.where(data.price <= data.Lower, 1, np.nan)
+        data["bposition"] = np.where(data.price >= data.Upper, -1, data["bposition"])
         data["bposition"] = np.where(data.distance * data.distance.shift(1) < 0, 0, data["bposition"])
         data["bposition"] = data.bposition.ffill().fillna(0)
         data["strategy"] = data.bposition.shift(1) * data["returns"]
         data.dropna(inplace=True)
 
+        # data['sposition'] = np.where(data.)
+
+        print(data.head(10).to_string())
+
         # Define position
-        data['position'] = np.where(data['sposition'] == data['bposition'], data['sposition'], 0)
+        data['position'] = np.where(data['sposition'] == data['bposition'], data['sposition'], data['bposition'])
 
         # determine the number of trades in each bar
         data["trades"] = data.position.diff().fillna(0).abs()
@@ -176,16 +180,16 @@ class SMACBOLLBacktester:
         return opt, best_perf
 
 if __name__ == '__main__':
-    tester = SMACBOLLBacktester(instrument='EUR_USD', start=str(date.today() - timedelta(1)), end=str(date.today()),
-                                granularity='M1', price='B', SMA_S=37, SMA_L=1, SMA=30, dev=2, tc=0.0)
+    tester = SMACBOLLBacktester(instrument='EUR_USD', start=str(date.today() - timedelta(30)), end=str(date.today()),
+                                granularity='M5', price='B', SMA_S=9, SMA_L=1, SMA=20, dev=2, tc=0.0)
 
     print(tester.test_strategy())
     tester.plot_results()
 
-    print(tester.optimize_parameters(SMA_S_range=(1, 50, 1), SMA_L_range=(51, 170, 1),
-                                     SMA_range=(10, 70, 1), dev_range=(1, 5, 1))[0])
-
-    tester.plot_results()
+    # print(tester.optimize_parameters(SMA_S_range=(1, 50, 1), SMA_L_range=(51, 170, 1),
+    #                                  SMA_range=(10, 70, 1), dev_range=(1, 5, 1))[0])
+    #
+    # tester.plot_results()
 
     wait = True
     while wait:
