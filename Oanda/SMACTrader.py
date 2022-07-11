@@ -103,15 +103,15 @@ class SMACTrader(tpqoa.tpqoa):
             self.position = 1
         elif self.data["position"].iloc[-1] == -1:
             if self.position == 0:
-                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True, sl_distance=.0001)#, tsl_distance=-.0003)
+                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True, sl_distance=-.0001)#, tsl_distance=-.0003)
                 self.report_trade(order, "GOING SHORT")
             elif self.position == 1:
-                order = self.create_order(self.instrument, -self.units * 2, suppress=True, ret=True, sl_distance=.0001)#, tsl_distance=-.0003)
+                order = self.create_order(self.instrument, -self.units * 2, suppress=True, ret=True, sl_distance=-.0001)#, tsl_distance=-.0003)
                 self.report_trade(order, "GOING SHORT")
             self.position = -1
         elif self.data["position"].iloc[-1] == 0:
             if self.position == -1:
-                order = self.create_order(self.instrument, self.units, suppress=True, ret=True, sl_distance=.0001)#, tsl_distance=-.0003)
+                order = self.create_order(self.instrument, self.units, suppress=True, ret=True, sl_distance=-.0001)#, tsl_distance=-.0003)
                 self.report_trade(order, "GOING NEUTRAL")
             elif self.position == 1:
                 order = self.create_order(self.instrument, -self.units, suppress=True, ret=True, sl_distance=.0001)#, tsl_distance=.0003)
