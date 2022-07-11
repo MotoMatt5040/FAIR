@@ -1,4 +1,5 @@
 import pandas as pd
+import pandas_ta as ta
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import product
@@ -6,18 +7,20 @@ import tpqoa
 from datetime import date, timedelta
 import keyboard
 import pickle
+import yfinance as yf
+
 plt.style.use('seaborn')
 
 # df = pd.read_csv('Materials/forex_pairs.csv', parse_dates=['Date'], index_col='Date')
 api = tpqoa.tpqoa('oanda.cfg')
 
-class SMABacktester:
 
+class StachBacktester:
     """ Class for the vectorized backtesting of SMA-based trading strategies.
     """
 
-
-    def __init__(self, instrument, start, end, SMA_S: int, SMA_L: int, granularity, price):  # ticker: str, SMA_S: int, SMA_L: int, start: str, end: str):
+    def __init__(self, instrument, start, end, granularity, price, k_period,
+                 d_period):  # ticker: str, SMA_S: int, SMA_L: int, start: str, end: str):
         """
         Parameters
         ----------
@@ -35,56 +38,83 @@ class SMABacktester:
 
         # self.ticker = ticker
         self._instrument = instrument
-        self._SMA_S = SMA_S
-        self._SMA_L = SMA_L
         self.price = price
         self.granularity = granularity
         self.start = start
         self.end = end
         self.results = None
+
+        self.k_period = k_period
+        self.d_period = d_period
+
         self.get_data()
         self.prepare_data()
 
     def __repr__(self):
-        return f'SMABacktester(ticker = {self._instrument}, SMA_S = {self._SMA_S}, SMA_L = {self._SMA_L}, start = {self.start}, end = {self.end})'
+        return f'SMABacktester(ticker = {self._instrument}, start = {self.start}, end = {self.end})'
 
     def get_data(self):
         """ Imports the data from forex_pairs.csv (source can be changed).
         """
-        print(api.get_history(instrument=self._instrument, start=self.start, end=self.end, granularity=self.granularity, price=self.price))
-        raw = api.get_history(instrument=self._instrument, start=self.start, end=self.end, granularity=self.granularity, price=self.price)
-        raw = raw.c.to_frame().dropna()
+        # print(api.get_history(instrument=self._instrument, start=self.start, end=self.end, granularity=self.granularity, price=self.price))
+        raw = api.get_history(instrument=self._instrument, start=self.start, end=self.end, granularity=self.granularity,
+                              price=self.price)
+        # print(raw.head(10).to_string())
+        # raw = raw.c.to_frame().dropna()
         raw = raw.loc[self.start: self.end].copy()
-        raw.rename(columns={'c': 'price'}, inplace=True)
-        raw['returns'] = np.log(raw / raw.shift(1))
+        raw.rename(columns={'c': 'close'}, inplace=True)
+        raw.rename(columns={'h': 'high'}, inplace=True)
+        raw.rename(columns={'l': 'low'}, inplace=True)
+        raw['returns'] = np.log(raw.close / raw.close.shift(1))
         self.data = raw
+        # print(raw)
+        print(raw.head(10).to_string())
         return raw
 
     def prepare_data(self):
         """Prepares the data for strategy backtesting (strategy-specific).
         """
         data = self.data.copy()
-        data['SMA_S'] = data['price'].rolling(self._SMA_S).mean()
-        data['SMA_L'] = data['price'].rolling(self._SMA_L).mean()
+
         self.data = data
 
-    def set_parameters(self, SMA_S = None, SMA_L = None):
+    def set_parameters(self, k_period=None, d_period=None):
         """ Updates SMA parameters and the prepared dataset.
         """
-        if SMA_S is not None:
-            self._SMA_S = SMA_S
-            self.data['SMA_S'] = self.data['price'].rolling(self._SMA_S).mean()
-        if SMA_L is not None:
-            self._SMA_L = SMA_L
-            self.data['SMA_L'] = self.data['price'].rolling(self._SMA_L).mean()
 
     def test_strategy(self):
         """ Backtests the SMA-based trading strategy.
         """
         data = self.data.copy().dropna()
-        data['position'] = np.where(data['SMA_S'] > data['SMA_L'], 1, -1)
-        data['strategy'] = data['position'].shift(1) * data['returns']
+        # Define periods
+        # k_period = 14
+        # d_period = 3
+        # Adds a "n_high" column with max value of previous 14 periods
+        data['n_high'] = data['high'].rolling(self.k_period).max()
+        # Adds an "n_low" column with min value of previous 14 periods
+        data['n_low'] = data['low'].rolling(self.k_period).min()
+        # Uses the min/max values to calculate the %k (as a percentage)
+        data['k'] = (data['close'] - data['n_low']) * 100 / (data['n_high'] - data['n_low'])
+        # Uses the %k to calculates a SMA over the past 3 values of %k
+        data['d'] = data['k'].rolling(self.d_period).mean()
+
+        data.ta.stoch(high='high', low='low', k=14, d=3, append=True)
         data.dropna(inplace=True)
+        # print(data.head(10).to_string())
+
+        # Overbought status
+        # if k > 80 and d > 80 and k < d:
+        #     sell
+        data['position'] = np.where((data['k'] > 80.0) & (data['d'] > 80.0) & (data['k'] < data['d']), -1, np.nan)
+        # Oversold status
+        # else if k < 20 and d < 20 and k > d:
+        data['position'] = np.where((data['k'] < 20.0) & (data['d'] < 20.0) & (data['k'] > data['d']), 1, np.nan)
+        data["position"] = data.position.ffill().fillna(0)
+        data['strategy'] = data['position'].shift(1) * data['returns']
+
+        data.dropna(inplace=True)
+
+        # print(data)
         data['creturns'] = data['returns'].cumsum().apply(np.exp)
         data['cstrategy'] = data['strategy'].cumsum().apply(np.exp)
         self.results = data
@@ -99,11 +129,11 @@ class SMABacktester:
         if self.results is None:
             print('Run test_strategy() strategy first.')
         else:
-            title = f'{self._instrument} | {self._SMA_S} | SMA_S | {self._SMA_L} | SMA_L'
+            title = f'{self._instrument} | k = {self.k_period} | d = {self.d_period}'
             self.results[['creturns', 'cstrategy']].plot(title=title, figsize=(12, 8))
             plt.show()
 
-    def optimize_parameters(self, SMA_S_range, SMA_L_range):
+    def optimize_parameters(self, k_period, d_period):
         """ Finds the optimal strategy (global maximum) given the SMA parameter ranges.
 
                 Parameters
@@ -111,7 +141,7 @@ class SMABacktester:
                 SMA_S_range, SMA_L_range: tuple
                     tuples of the form (start, end, step size)
         """
-        combinations = list(product(range(*SMA_S_range), range(*SMA_L_range)))
+        combinations = list(product(range(*k_period), range(*d_period)))
         print(f'{len(combinations)} strategies being tested')
 
         # test all combinations
@@ -128,25 +158,28 @@ class SMABacktester:
         self.test_strategy()
 
         # create a df with many results
-        many_results = pd.DataFrame(data=combinations, columns=['SMA_S', 'SMA_L'])
+        many_results = pd.DataFrame(data=combinations, columns=['k_period', 'd_period'])
         many_results['performance'] = results
         self.results_overview = many_results
 
-        pickle.dump(opt, open("sma_update.pkl", "wb"))
+        pickle.dump(opt, open("stach_update.pkl", "wb"))
 
         return opt, best_perf
 
+
 if __name__ == '__main__':
-    tester = SMABacktester(instrument='EUR_USD', start=str(date.today() - timedelta(1)), end=str(date.today()), granularity='M1', price='B', SMA_S=37, SMA_L=1)
+    tester = StachBacktester(instrument='EUR_USD', start=str(date.today() - timedelta(1)), end=str(date.today()),
+                             granularity='M1', price='B', k_period=14, d_period=3)
 
     print(tester.test_strategy())
-    # tester.plot_results()
+    tester.plot_results()
 
-    print(tester.optimize_parameters((1, 50, 1), (51, 252, 1))[0])
+    print(tester.optimize_parameters(k_period=(1, 50, 1), d_period=(1, 50, 1)))
+
+    tester.plot_results()
 
     wait = True
     while wait:
         if keyboard.is_pressed('1'):
             wait = False
     # tester.plot_results()
-
