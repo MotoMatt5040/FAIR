@@ -95,26 +95,26 @@ class SMACTrader(tpqoa.tpqoa):
     def execute_trades(self):
         if self.data["position"].iloc[-1] == 1:
             if self.position == 0:
-                order = self.create_order(self.instrument, self.units, suppress=True, ret=True, sl_distance=.0001 )#, tsl_distance=.0003)
+                order = self.create_order(self.instrument, self.units, suppress=True, ret=True)#, sl_distance=.0003, tsl_distance=.0003)
                 self.report_trade(order, "GOING LONG")
             elif self.position == -1:
-                order = self.create_order(self.instrument, self.units * 2, suppress=True, ret=True, sl_distance=.0001)#, tsl_distance=.0003)
+                order = self.create_order(self.instrument, self.units * 2, suppress=True, ret=True)#, sl_distance=.0003, tsl_distance=.0003)
                 self.report_trade(order, "GOING LONG")
             self.position = 1
         elif self.data["position"].iloc[-1] == -1:
             if self.position == 0:
-                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True, sl_distance=-.0001)#, tsl_distance=-.0003)
+                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True)#, sl_distance=.0003, tsl_distance=.0003)
                 self.report_trade(order, "GOING SHORT")
             elif self.position == 1:
-                order = self.create_order(self.instrument, -self.units * 2, suppress=True, ret=True, sl_distance=-.0001)#, tsl_distance=-.0003)
+                order = self.create_order(self.instrument, -self.units * 2, suppress=True, ret=True)#, sl_distance=.0003, tsl_distance=.0003)
                 self.report_trade(order, "GOING SHORT")
             self.position = -1
         elif self.data["position"].iloc[-1] == 0:
             if self.position == -1:
-                order = self.create_order(self.instrument, self.units, suppress=True, ret=True, sl_distance=-.0001)#, tsl_distance=-.0003)
+                order = self.create_order(self.instrument, self.units, suppress=True, ret=True)#, sl_distance=.0003, tsl_distance=-.0003)
                 self.report_trade(order, "GOING NEUTRAL")
             elif self.position == 1:
-                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True, sl_distance=.0001)#, tsl_distance=.0003)
+                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True)#, sl_distance=.0003, tsl_distance=.0003)
                 self.report_trade(order, "GOING NEUTRAL")
             self.position = 0
 
@@ -129,6 +129,7 @@ class SMACTrader(tpqoa.tpqoa):
         print("{} | {}".format(time, going))
         print("{} | units = {} | price = {} | P&L = {} | Cum P&L = {}".format(time, units, price, pl, cumpl))
         print(100 * "-" + "\n")
+        pass
 
     #  def reset_parameters(self):
 
