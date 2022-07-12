@@ -69,7 +69,8 @@ class MeanRevBacktester():
         data["SMA"] = data["price"].rolling(self.SMA).mean()
         data["Lower"] = data["SMA"] - data["price"].rolling(self.SMA).std() * self.dev
         data["Upper"] = data["SMA"] + data["price"].rolling(self.SMA).std() * self.dev
-        self.data = data
+        self.data = data.dropna()
+        print(self.data)
 
     def set_parameters(self, SMA=None, dev=None):
         ''' Updates parameters (SMA, dev) and the prepared dataset.
@@ -106,6 +107,7 @@ class MeanRevBacktester():
         data["creturns"] = data["returns"].cumsum().apply(np.exp)
         data["cstrategy"] = data["strategy"].cumsum().apply(np.exp)
         self.results = data
+
 
         perf = data["cstrategy"].iloc[-1]  # absolute performance of the strategy
         outperf = perf - data["creturns"].iloc[-1]  # out-/underperformance of strategy
@@ -157,9 +159,11 @@ class MeanRevBacktester():
 
 # mr = MeanRevBacktester('EURUSD', 30, 2, '2018-01-01', '2019-12-30', 0.000, 100000.0)
 
-mr = MeanRevBacktester(instrument='EUR_USD', start=str(datetime.now() - timedelta(days=365))[:-7], end=str(datetime.now())[:-7],
-                                granularity='M1', price='B', SMA=30, dev=1, tc=0.0)
+mr = MeanRevBacktester(instrument='EUR_USD', start=str(datetime.now() - timedelta(days=30))[:-7], end=str(datetime.now())[:-7],
+                                granularity='H1', price='B', SMA=30, dev=1, tc=0.0)
 
-# print(mr.optimize_parameters((1, 70, 1), (1, 5, 1)))
 print(mr.test_strategy())
+mr.plot_results()
+
+print(mr.optimize_parameters((5, 70, 1), (1, 3, 1)))
 mr.plot_results()

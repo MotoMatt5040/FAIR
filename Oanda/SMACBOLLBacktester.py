@@ -114,7 +114,7 @@ class SMACBOLLBacktester:
 
         # data['sposition'] = np.where(data.)
 
-        print(data.head(10).to_string())
+        # print(data.head(10).to_string())
 
         # Define position
         data['position'] = np.where(data['sposition'] == data['bposition'], data['sposition'], data['bposition'])
@@ -181,15 +181,15 @@ class SMACBOLLBacktester:
 
 if __name__ == '__main__':
     tester = SMACBOLLBacktester(instrument='EUR_USD', start=str(date.today() - timedelta(30)), end=str(date.today()),
-                                granularity='M5', price='B', SMA_S=9, SMA_L=1, SMA=20, dev=2, tc=0.0)
+                                granularity='M15', price='B', SMA_S=9, SMA_L=1, SMA=20, dev=2, tc=0.0)
 
     print(tester.test_strategy())
     tester.plot_results()
 
-    # print(tester.optimize_parameters(SMA_S_range=(1, 50, 1), SMA_L_range=(51, 170, 1),
-    #                                  SMA_range=(10, 70, 1), dev_range=(1, 5, 1))[0])
-    #
-    # tester.plot_results()
+    print(tester.optimize_parameters(SMA_S_range=(1, 20, 1), SMA_L_range=(21, 170, 1),
+                                     SMA_range=(10, 50, 1), dev_range=(1, 3, 1))[0])
+
+    tester.plot_results()
 
     wait = True
     while wait:
