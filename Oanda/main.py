@@ -25,7 +25,7 @@ logger.propagate = False
 # b = bot.Bot(0.01, 5 * 60, "XAUUSD")
 b = bot.Bot(3.0, 10, "USDJPY")
 
-markets = ['EURUSD', 'GBPUSD', 'XAUUSD', 'USDJPY']
+# markets = ['EURUSD', 'GBPUSD', 'XAUUSD', 'USDJPY']
 
 # for market in markets:
 
@@ -66,9 +66,10 @@ while server is None:
         server = 'Hankotrade-Demo'
         print(f'\nYou selected: {server}\n')
 
-# Login into mt5
-if not b.mt5_login(usr, password, server):
-    quit()
+# # Login into mt5
+# if not b.mt5_login(usr, password, server):
+#     quit()
+b.oanda_login()
 b.thread_tick_reader()
 b.thread_slope_abs_rel()
 b.thread_MACD()

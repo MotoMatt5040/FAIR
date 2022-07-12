@@ -7,7 +7,7 @@ import time
 
 class SMACTrader(tpqoa.tpqoa):
 
-    def __init__(self, config_file, instrument, bar_length, smas, smal, units):
+    def __init__(self, config_file, instrument, bar_length, smas, smal, sma, dev, units):
         super().__init__(config_file)
         self.instrument = instrument  # define instrument
         self.bar_length = pd.to_timedelta(bar_length)  # Pandas Timedelta Object
@@ -22,6 +22,8 @@ class SMACTrader(tpqoa.tpqoa):
         # *****************add strategy-specific attributes here******************
         self.smas = smas
         self.smal = smal
+        self.sma = sma
+        self.dev = dev
         # ************************************************************************
 
     def get_most_recent(self, days=5):
@@ -31,7 +33,7 @@ class SMACTrader(tpqoa.tpqoa):
             now = now - timedelta(microseconds=now.microsecond)
             past = now - timedelta(days=days)
             df = self.get_history(instrument=self.instrument, start=past, end=now,
-                                  granularity="M1", price="M", localize=False).c.dropna().to_frame()
+                                  granularity="S5", price="M", localize=False).c.dropna().to_frame()
             df.rename(columns={"c": self.instrument}, inplace=True)
             df = df.resample(self.bar_length, label="right").last().dropna().iloc[:-1]
             self.raw_data = df.copy()  # first defined
@@ -87,7 +89,20 @@ class SMACTrader(tpqoa.tpqoa):
         #SMA Crossover
         df['SMAS'] = df[self.instrument].rolling(self.smas).mean()
         df['SMAL'] = df[self.instrument].rolling(self.smal).mean()
-        df['position'] = np.where(df['SMAS'] > df['SMAL'], 1, -1)
+        df['sposition'] = np.where(df['SMAS'] > df['SMAL'], 1, -1)
+
+        #Bollinger
+        df["SMA"] = df[self.instrument].rolling(self.sma).mean()
+        df["Lower"] = df["SMA"] - df[self.instrument].rolling(self.sma).std() * self.dev
+        df["Upper"] = df["SMA"] + df[self.instrument].rolling(self.sma).std() * self.dev
+        df["distance"] = df[self.instrument] - df.SMA
+        df["bposition"] = np.where(df[self.instrument] < df.Lower, 1, np.nan)
+        df["bposition"] = np.where(df[self.instrument] > df.Upper, -1, df["bposition"])
+        df["bposition"] = np.where(df.distance * df.distance.shift(1) < 0, 0, df["bposition"])
+        df["bposition"] = df.bposition.ffill().fillna(0)
+
+        #Define position
+        df['position'] = np.where(df['sposition'] == df['bposition'], df['sposition'], 0)
         # ***********************************************************************
 
         self.data = df.copy()  # first defined here
@@ -95,26 +110,26 @@ class SMACTrader(tpqoa.tpqoa):
     def execute_trades(self):
         if self.data["position"].iloc[-1] == 1:
             if self.position == 0:
-                order = self.create_order(self.instrument, self.units, suppress=True, ret=True)#, sl_distance=.0003, tsl_distance=.0003)
+                order = self.create_order(self.instrument, self.units, suppress=True, ret=True)
                 self.report_trade(order, "GOING LONG")
             elif self.position == -1:
-                order = self.create_order(self.instrument, self.units * 2, suppress=True, ret=True)#, sl_distance=.0003, tsl_distance=.0003)
+                order = self.create_order(self.instrument, self.units * 2, suppress=True, ret=True)
                 self.report_trade(order, "GOING LONG")
             self.position = 1
         elif self.data["position"].iloc[-1] == -1:
             if self.position == 0:
-                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True)#, sl_distance=.0003, tsl_distance=.0003)
+                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True)
                 self.report_trade(order, "GOING SHORT")
             elif self.position == 1:
-                order = self.create_order(self.instrument, -self.units * 2, suppress=True, ret=True)#, sl_distance=.0003, tsl_distance=.0003)
+                order = self.create_order(self.instrument, -self.units * 2, suppress=True, ret=True)
                 self.report_trade(order, "GOING SHORT")
             self.position = -1
         elif self.data["position"].iloc[-1] == 0:
             if self.position == -1:
-                order = self.create_order(self.instrument, self.units, suppress=True, ret=True)#, sl_distance=.0003, tsl_distance=-.0003)
+                order = self.create_order(self.instrument, self.units, suppress=True, ret=True)
                 self.report_trade(order, "GOING NEUTRAL")
             elif self.position == 1:
-                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True)#, sl_distance=.0003, tsl_distance=.0003)
+                order = self.create_order(self.instrument, -self.units, suppress=True, ret=True)
                 self.report_trade(order, "GOING NEUTRAL")
             self.position = 0
 
@@ -129,7 +144,6 @@ class SMACTrader(tpqoa.tpqoa):
         print("{} | {}".format(time, going))
         print("{} | units = {} | price = {} | P&L = {} | Cum P&L = {}".format(time, units, price, pl, cumpl))
         print(100 * "-" + "\n")
-        pass
 
     #  def reset_parameters(self):
 
