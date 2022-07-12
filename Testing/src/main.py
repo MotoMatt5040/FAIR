@@ -1,4 +1,4 @@
-11# FAIR (Forex AI Repository) Project
+# FAIR (Forex AI Repository) Project
 # V 1.0
 # 5/10/2022
 
