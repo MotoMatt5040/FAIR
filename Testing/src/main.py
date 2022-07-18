@@ -1,4 +1,4 @@
-11# FAIR (Forex AI Repository) Project
+# FAIR (Forex AI Repository) Project
 # V 1.0
 # 5/10/2022
 
@@ -23,9 +23,9 @@ logger.propagate = False
 # Creating a bot
 # TODO Fix bot statement
 # b = bot.Bot(0.01, 5 * 60, "XAUUSD")
-b = bot.Bot(3.0, 10, "USDJPY")
+b = bot.Bot(5.0, 10, "USDJPY")
 
-markets = ['EURUSD', 'GBPUSD', 'XAUUSD', 'USDJPY']
+# markets = ['EURUSD', 'GBPUSD', 'XAUUSD', 'USDJPY']
 
 # for market in markets:
 
@@ -37,9 +37,11 @@ markets = ['EURUSD', 'GBPUSD', 'XAUUSD', 'USDJPY']
 
 print('''Which account would you like to use
     1: MT5 Demo
-    2: Hanko Demo''')
+    2: Hanko Demo
+    3: Traders Domain - Live''')
 usr = None
-while usr is None:
+password = None
+while usr is None or password is None:
     if keyboard.is_pressed('1'):
         usr = 5003534489
         password = '6jsxifbk'
@@ -48,12 +50,17 @@ while usr is None:
         usr = 805062
         password = 'R6rz@i@Ue!#bCAn'
         print(f'\nYou selected: {usr}\n')
+    elif keyboard.is_pressed('3'):
+        usr = 10035241
+        password = 'R3k5tpbz'
+        print(f'\nYou selected: {usr}\n')
 
 time.sleep(0.1)
 print('''Which server would you like to connect to?
     1: MetaQuotes-Demo
     2: OANDA-Demo-2
-    3: Hankotrade-Demo''')
+    3: Hankotrade-Demo
+    4: TradersDomainFX-MetaTrader5''')
 server = None
 while server is None:
     if keyboard.is_pressed('1'):
@@ -65,10 +72,14 @@ while server is None:
     elif keyboard.is_pressed('3'):
         server = 'Hankotrade-Demo'
         print(f'\nYou selected: {server}\n')
+    elif keyboard.is_pressed('4'):
+        server = 'TradersDomainFX-MetaTrader5'
+        print(f'\nYou selected: {server}\n')
 
-# Login into mt5
+# # Login into mt5
 if not b.mt5_login(usr, password, server):
     quit()
+# b.oanda_login()
 b.thread_tick_reader()
 b.thread_slope_abs_rel()
 b.thread_MACD()
