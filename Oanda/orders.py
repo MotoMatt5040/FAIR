@@ -1,49 +1,50 @@
-import MACD, RSI, time
+import MACD, RSI, SMACrossover, time
 import datetime as date
 import MetaTrader5 as mt5
 
 # Global variables
-THRESHOLD = 20
-MARGIN = 10
+THRESHOLD = 5
+MARGIN = 100
 # TODO ADJUST TIME BETWEEN OPERATIONS
 # TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
-TIME_BETWEEN_OPERATIONS = 10
-STOPLOSS = 30
-TAKEPROFIT = 30
-TRAIL_AMOUNT = 0.005  # 50 pips
+TIME_BETWEEN_OPERATIONS = 10 * 60
+STOPLOSS = 100
+TAKEPROFIT = 200
+TRAIL_AMOUNT = 50  # 50 pips
 
 
 def handle_stoploss(order: int, position):
 
-    ticket = position.ticket
-    symbol = position.symbol
-    order_type = position.type
-    price_current = position.price_current
-    price_open = position.price_open
-    sl = position.sl
-    # calculating distance from sl
-    dist_from_sl = abs(round(price_current - sl, 6))
-
-    # calculating new sl
-    if dist_from_sl > TRAIL_AMOUNT:
-        if sl != 0.0:
-            if order_type == 0:  # BUY
-                sl = sl + TRAIL_AMOUNT
-            elif order_type == 1:  # SELL
-                sl = sl - TRAIL_AMOUNT
-        request = {
-            "action": mt5.TRADE_ACTION_SLTP,
-            "sl": sl,
-            "tp": 20,
-            "position": ticket
-        }
-
-        result = mt5.order_send(request)
-
-    else:
-        sl = price_open - TRAIL_AMOUNT if order_type == 0 else price_open + TRAIL_AMOUNT
-        return
-    return result
+    # ticket = position.ticket
+    # symbol = position.symbol
+    # order_type = position.type
+    # price_current = position.price_current
+    # price_open = position.price_open
+    # sl = position.sl
+    # # calculating distance from sl
+    # dist_from_sl = abs(round(price_current - sl, 6))
+    #
+    # # calculating new sl
+    # if dist_from_sl > TRAIL_AMOUNT:
+    #     if sl != 0.0:
+    #         if order_type == 0:  # BUY
+    #             sl = sl + TRAIL_AMOUNT
+    #         elif order_type == 1:  # SELL
+    #             sl = sl - TRAIL_AMOUNT
+    #     request = {
+    #         "action": mt5.TRADE_ACTION_SLTP,
+    #         "sl": sl,
+    #         # "tp": 20,
+    #         "position": ticket
+    #     }
+    #
+    #     result = mt5.order_send(request)
+    #
+    # else:
+    #     sl = price_open - TRAIL_AMOUNT if order_type == 0 else price_open + TRAIL_AMOUNT
+    #     return
+    # return result
+    pass
 
 def handle_buy(buy, market):
     """Function to handle a buy operation.
@@ -65,7 +66,7 @@ def handle_buy(buy, market):
                 "sl": tick.ask - MARGIN * point,
                 "tp": tick.ask + MARGIN * point,
                 "deviation": 20,
-                "magic": 234000,
+                "magic": 235000,
                 "comment": "python script open",
                 "type_time": mt5.ORDER_TIME_GTC,
                 "type_filling": mt5.ORDER_FILLING_RETURN,
@@ -79,7 +80,8 @@ def handle_buy(buy, market):
         if len(mt5.positions_get(ticket=position)) == 0:
             return
         else:
-            handle_stoploss(1, mt5.positions_get(ticket=position)[0])
+            # handle_stoploss(1, mt5.positions_get(ticket=position)[0])
+            pass
         time.sleep(0.1)
 
 
@@ -103,7 +105,7 @@ def handle_sell(sell, market: str):
                 "sl": tick.bid + MARGIN * point,
                 "tp": tick.bid - MARGIN * point,
                 "deviation": 20,
-                "magic": 234000,
+                "magic": 235000,
                 "comment": "python script open",
                 "type_time": mt5.ORDER_TIME_GTC,
                 "type_filling": mt5.ORDER_FILLING_RETURN,
@@ -116,7 +118,8 @@ def handle_sell(sell, market: str):
         if len(mt5.positions_get(ticket=position)) == 0:
             return
         else:
-            handle_stoploss(1, mt5.positions_get(ticket=position)[0])
+            pass
+            # handle_stoploss(1, mt5.positions_get(ticket=position)[0])
         time.sleep(0.1)
 
 
@@ -137,7 +140,7 @@ def open_buy(trading_data: dict):
     counter = 0
     # We only open the operation if the spread is 0
     # we check the spread 300000 times
-    while symbol_info.spread > 10 and counter < 300000:
+    while symbol_info.spread > 25 and counter < 300000:
         counter += 1
         symbol_info = mt5.symbol_info(trading_data['market'])
 
@@ -167,7 +170,7 @@ def open_buy(trading_data: dict):
         "sl": price - STOPLOSS * point,
         "tp": price + TAKEPROFIT * point,
         "deviation": deviation,
-        "magic": 234000,
+        "magic": 235000,
         "comment": "python script open",
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_IOC,
@@ -205,7 +208,7 @@ def open_sell(trading_data: dict):
     counter = 0
     # We only open the operation if the spread is 0
     # we check the spread 300000 times
-    while symbol_info.spread > 10 and counter < 300000:
+    while symbol_info.spread > 25 and counter < 300000:
         counter += 1
         symbol_info = mt5.symbol_info(trading_data['market'])
 
@@ -235,7 +238,7 @@ def open_sell(trading_data: dict):
         "sl": price + STOPLOSS * point,
         "tp": price - TAKEPROFIT * point,
         "deviation": deviation,
-        "magic": 234000,
+        "magic": 235000,
         "comment": "python script open",
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_IOC,
@@ -264,9 +267,10 @@ def check_buy() -> bool:
     """
     # TODO REMOVE PRINT LINES
     # print(MACD.check_buy(), RSI.check_buy())
-    return MACD.check_buy() and RSI.check_buy()
+    # return MACD.check_buy() and RSI.check_buy()
     # TODO FIX RETURN STATEMENT
     # return True
+    return SMACrossover.check_buy()
 
 def check_sell() -> bool:
     """Function to check if we can open a sell.
@@ -275,8 +279,9 @@ def check_sell() -> bool:
         bool: True if we can, false if not.
     """
     # TODO FIX RETURN STATEMENT
-    return MACD.check_sell() and RSI.check_sell()
+    # return MACD.check_sell() and RSI.check_sell()
     # return True
+    return SMACrossover.check_sell()
 
 def thread_orders(pill2kill, trading_data: dict):
     """Function executed by a thread. It opens and handles operations.

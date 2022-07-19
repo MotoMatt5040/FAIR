@@ -12,51 +12,38 @@ plt.style.use('seaborn')
 # df = pd.read_csv('Materials/forex_pairs.csv', parse_dates=['Date'], index_col='Date')
 api = tpqoa.tpqoa('oanda.cfg')
 
-class SMABacktester:
+class SMACBacktester:
 
     """ Class for the vectorized backtesting of SMA-based trading strategies.
     """
 
 
-    def __init__(self, instrument, start, end, SMA_S: int, SMA_L: int, granularity, price):  # ticker: str, SMA_S: int, SMA_L: int, start: str, end: str):
+    def __init__(self, ticks: list):
         """
         Parameters
         ----------
-        symbol: str
-            ticker symbol (instrument) to be backtested
-        SMA_S: int
-            moving window in bars (e.g. days) for shorter SMA
-        SMA_L: int
-            moving window in bars (e.g. days) for longer SMA
-        start: str
-            start date for data import
-        end: str
-            end date for data import
+        ticks: list
+            ticks to be backtested
         """
 
         # self.ticker = ticker
-        self._instrument = instrument
-        self._SMA_S = SMA_S
-        self._SMA_L = SMA_L
-        self.price = price
-        self.granularity = granularity
-        self.start = start
-        self.end = end
+        self.ticks = ticks
+        self._SMA_S = 30
+        self._SMA_L = 50
         self.results = None
         self.get_data()
         self.prepare_data()
 
     def __repr__(self):
-        return f'SMABacktester(ticker = {self._instrument}, SMA_S = {self._SMA_S}, SMA_L = {self._SMA_L}, start = {self.start}, end = {self.end})'
+        return f'SMACBacktester(SMA_S = {self._SMA_S}, SMA_L = {self._SMA_L})'
 
     def get_data(self):
         """ Imports the data from forex_pairs.csv (source can be changed).
         """
-        print(api.get_history(instrument=self._instrument, start=self.start, end=self.end, granularity=self.granularity, price=self.price))
-        raw = api.get_history(instrument=self._instrument, start=self.start, end=self.end, granularity=self.granularity, price=self.price)
-        raw = raw.c.to_frame().dropna()
-        raw = raw.loc[self.start: self.end].copy()
-        raw.rename(columns={'c': 'price'}, inplace=True)
+        raw = pd.DataFrame(self.ticks, columns=['price'])
+        # raw = raw[0].to_frame().dropna()
+        # raw = raw.loc[self.start: self.end].copy()
+        # raw.rename(columns={'c': 'price'}, inplace=True)
         raw['returns'] = np.log(raw / raw.shift(1))
         self.data = raw
         return raw
@@ -100,7 +87,7 @@ class SMABacktester:
         if self.results is None:
             print('Run test_strategy() strategy first.')
         else:
-            title = f'{self._instrument} | {self._SMA_S} | SMA_S | {self._SMA_L} | SMA_L'
+            title = f'{self._SMA_S} | SMA_S | {self._SMA_L} | SMA_L'
             self.results[['creturns', 'cstrategy']].plot(title=title, figsize=(12, 8))
             plt.show()
 
@@ -138,14 +125,13 @@ class SMABacktester:
         return opt, best_perf
 
 if __name__ == '__main__':
-    tester = SMABacktester(instrument='EUR_USD', start=str(datetime.now() - timedelta(days=1))[:-7],
-                           end=str(datetime.now())[:-7], granularity='M5', price='B', SMA_S=37, SMA_L=1)
+    # tester = SMACBacktester(SMA_S=37, SMA_L=1)
 
 
-    print(tester.test_strategy())
-    # tester.plot_results()
-
-    print(tester.optimize_parameters((1, 50, 1), (51, 170, 1))[0])
+    # print(tester.test_strategy())
+    # # tester.plot_results()
+    #
+    # print(tester.optimize_parameters((1, 50, 1), (51, 170, 1))[0])
 
     wait = True
     while wait:

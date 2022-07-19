@@ -32,23 +32,23 @@ smau = smabt.SMABacktester(instrument='EUR_USD', start=str(datetime.now() - time
 
 def sma_update():
     print(smau.optimize_parameters((1, 20, 1), (21, 100, 1))[0])
-    smau.plot_results()
+    # smau.plot_results()
 
 
 def sma_trading():
     while True:
-        # try:
-        sma_update()
-        smatrader.get_most_recent()
-        smatrader.stream_data(smatrader.instrument)  # , stop=20000
-        if smatrader.position != 0:  # if we have a final open position
-            close_order = smatrader.create_order(smatrader.instrument, units=-smatrader.position * smatrader.units,
-                                                 suppress=True, ret=True)
-            smatrader.report_trade(close_order, "GOING NEUTRAL")
-            smatrader.position = 0
-        # except Exception as err:
-        #     print(err)
-        #     time.sleep(900)
+        try:
+            sma_update()
+            smatrader.get_most_recent()
+            smatrader.stream_data(smatrader.instrument)  # , stop=20000
+            if smatrader.position != 0:  # if we have a final open position
+                close_order = smatrader.create_order(smatrader.instrument, units=-smatrader.position * smatrader.units,
+                                                     suppress=True, ret=True)
+                smatrader.report_trade(close_order, "GOING NEUTRAL")
+                smatrader.position = 0
+        except Exception as err:
+            print(err)
+            time.sleep(900)
 
 
 # print(lags, type(lags), granularity, type(granularity), sep=', ')

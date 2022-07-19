@@ -46,6 +46,7 @@ def load_ticks(ticks: list, market: str, time_period: int):
     timezone = pytz.timezone("Etc/UTC")
     utc_from = datetime.datetime(int(yesterday.year), int(yesterday.month), int(yesterday.day), tzinfo=timezone)
     loaded_ticks = mt5.copy_ticks_from(market, utc_from, 300000, mt5.COPY_TICKS_ALL)
+    # print(mt5.copy_ticks_from(market, utc_from, 300000, mt5.COPY_TICKS_ALL))
     if loaded_ticks is None:
         print("Error loading the ticks")
         return -1
@@ -80,7 +81,8 @@ def thread_tick_reader(pill2kill, ticks: list, trading_data: dict):
 
     # Filling the list with previos ticks
     load_ticks(ticks, trading_data['market'], trading_data['time_period'])
-    
+    # print(load_ticks())
+
     print("[THREAD - tick_reader] - Ticks loaded")
    
     # Filling the list with actual ticks
@@ -94,6 +96,7 @@ def thread_tick_reader(pill2kill, ticks: list, trading_data: dict):
             i = 0
         
         # Computing the average spread
+        # print(mt5.symbol_info(trading_data['market']))
         spread_list.append(mt5.symbol_info(trading_data['market']).spread)
         if len(spread_list) >= MAX_LEN_SPREAD:
             trading_data['avg_spread'] = sum(spread_list) / len(spread_list)
