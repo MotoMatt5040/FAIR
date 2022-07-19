@@ -22,7 +22,7 @@ def check_buy() -> bool:
     # TODO REMOVE PRINT LINE
     # print(f'Previous MACD: {PREV_MACD}|Previous Signal: {PREV_SIGNAL}||Current MACD: {CUR_MACD}|Current Signal: {CUR_SIGNAL}')
     if CUR_SIGNAL == None or CUR_MACD == None \
-        or PREV_SIGNAL == None or PREV_MACD == None:
+            or PREV_SIGNAL == None or PREV_MACD == None:
         return False
     if PREV_SIGNAL >= PREV_MACD:
         if CUR_SIGNAL <= CUR_MACD:
@@ -39,7 +39,7 @@ def check_sell() -> bool:
     """
 
     if CUR_SIGNAL == None or CUR_MACD == None \
-        or PREV_SIGNAL == None or PREV_MACD == None:
+            or PREV_SIGNAL == None or PREV_MACD == None:
         return False
     if PREV_SIGNAL <= PREV_MACD:
         if CUR_SIGNAL >= CUR_MACD:
@@ -52,11 +52,11 @@ def K(n):
 
     Args:
         n (int): Length
-    
+
     Returns:
         float: value
     """
-    return 2/(n+1)
+    return 2 / (n + 1)
 
 
 def SMA(ticks):
@@ -68,11 +68,11 @@ def SMA(ticks):
     Returns:
         float: value
     """
-    return sum(ticks)/len(ticks)
+    return sum(ticks) / len(ticks)
 
 
 def EMA(ticks: list, n: int):
-    """Function that computes the Exponential Moving Average.   
+    """Function that computes the Exponential Moving Average.
 
     Args:
         ticks (list): List of prices.
@@ -83,39 +83,39 @@ def EMA(ticks: list, n: int):
         float: Value of the EMA
     """
     global PREV_EMA12, PREV_EMA26, PREV_EMA9
-    
+
     if n != 12 and n != 26 and n != 9:
         print("EMA function: N must be 12 or 26 or 9")
-    
+
     # Not enough ticks in the list
     if n > len(ticks): return None
-    
+
     k = K(n)
-    
+
     # Checking if the previous EMA has been calculated
     prev_ema = 0
     if n == 12:
-        if PREV_EMA12 is None: 
+        if PREV_EMA12 is None:
             prev_ema = SMA(ticks)
         else:
             prev_ema = PREV_EMA12
-        ema = (ticks[-1] - prev_ema)*k + prev_ema
-        PREV_EMA12 = ema 
+        ema = (ticks[-1] - prev_ema) * k + prev_ema
+        PREV_EMA12 = ema
     elif n == 26:
-        if PREV_EMA26 is None: 
+        if PREV_EMA26 is None:
             prev_ema = SMA(ticks)
         else:
             prev_ema = PREV_EMA26
-        ema = (ticks[-1] - prev_ema)*k + prev_ema
-        PREV_EMA26 = ema 
+        ema = (ticks[-1] - prev_ema) * k + prev_ema
+        PREV_EMA26 = ema
     else:
-        if PREV_EMA9 is None: 
+        if PREV_EMA9 is None:
             prev_ema = SMA(ticks)
         else:
             prev_ema = PREV_EMA9
-        ema = (ticks[-1] - prev_ema)*k + prev_ema
-        PREV_EMA9 = ema 
-    
+        ema = (ticks[-1] - prev_ema) * k + prev_ema
+        PREV_EMA9 = ema
+
     return ema
 
 
@@ -154,11 +154,11 @@ def thread_macd(pill2kill, ticks: list, indicators: dict, trading_data: dict):
         trading_data (dict): Dictionary where the data about our bot is stored.
     """
     global MACDs, CUR_SIGNAL, CUR_MACD, PREV_SIGNAL, PREV_MACD
-    
+
     # Wait if there are not enough elements
     while len(ticks) < 35 and not pill2kill.wait(1.5):
         print("[THREAD - MACD] - Waiting for ticks")
-    
+
     print("[THREAD - MACD] - Loading values")
     # First we need to calculate the previous MACDs and SIGNALs
     i = 26
@@ -167,16 +167,16 @@ def thread_macd(pill2kill, ticks: list, indicators: dict, trading_data: dict):
         PREV_MACD = CUR_MACD
         CUR_MACD = MACD(ticks[:i])
         MACDs.append(CUR_MACD)
-        
-        i+=1
-        
+
+        i += 1
+
         # Computing the SIGNAL
         if len(MACDs) < 9:
             continue
         else:
             PREV_SIGNAL = CUR_SIGNAL
             CUR_SIGNAL = SIGNAL(MACDs)
-        
+
         if len(MACDs) > 9:
             del MACDs[0]
 
@@ -187,19 +187,19 @@ def thread_macd(pill2kill, ticks: list, indicators: dict, trading_data: dict):
         # Computing the MACD
         PREV_MACD = CUR_MACD
         CUR_MACD = MACD(ticks[-26:])
-        
+
         # Only append a MACD value every time period
         if i >= trading_data['time_period']:
             MACDs.append(CUR_MACD)
             i = 0
         else:
             MACDs[-1] = CUR_MACD
-        i+=1
-        
+        i += 1
+
         # Computing the SIGNAL
         PREV_SIGNAL = CUR_SIGNAL
         CUR_SIGNAL = SIGNAL(MACDs)
-        
+
         # Updating the dictionary
         indicators['MACD']['MACD'] = CUR_MACD
         indicators['MACD']['SIGNAL'] = CUR_SIGNAL

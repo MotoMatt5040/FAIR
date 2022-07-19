@@ -105,9 +105,9 @@ def thread_slope_abs_rel(pill2kill, ticks: list, indicators: dict):
     
     # Waiting until the list is ready
     while len(ticks) < N_FOR_SLOPE and not pill2kill.wait(1.5): 
-        print("[THREAD - slope_abs_rel] - Waiting for ticks")
+        print("[THREAD - slope_abs_rel] - Waiting for ticks\n")
 
-    print("[THREAD - slope_abs_rel] - Computing values")
+    print("[THREAD - slope_abs_rel] - Computing values\n")
     while not pill2kill.wait(1):
         # Getting the slope
         indicators['slope'] = st.slopeY(ticks[-N_FOR_SLOPE:])
