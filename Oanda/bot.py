@@ -1,7 +1,7 @@
 import threading
 import MetaTrader5 as mt5
 import tick_reader, slope_abs_rel, orders
-import MACD, RSI
+import MACD, RSI, SMACrossover
 import tpqoa
 
 
@@ -22,6 +22,7 @@ class Bot:
     indicators = {
         "MACD": {"MACD": 0.0, "SIGNAL": 0.0},
         "RSI": 0.0,
+        "SMAC": {"SMAS": 0.0, "SMAL": 0.0},
         "slope": 0.0,
         "absolute_max": {"time": 0.0, "difference": 0.0},
         "absolute_min": {"time": 0.0, "difference": 0.0},
@@ -85,6 +86,19 @@ class Bot:
         self.threads.append(t)
         t.start()
         print('Thread - RSI. LAUNCHED')
+
+    def thread_SMAC(self):
+
+        t = threading.Thread(target=SMACrossover.thread_SMAC,
+                            args=(self.pill2kill, self.ticks, self.indicators))
+        self.threads.append(t)
+        t.start()
+
+        t = threading.Thread(target=SMACrossover.thread_SMAC_update,
+                            args=(self.pill2kill, self.ticks, self.indicators))
+        self.threads.append(t)
+        t.start()
+        print('Thread - SMAC. LAUNCHED')
 
     def thread_orders(self):
         t = threading.Thread(target=orders.thread_orders,
