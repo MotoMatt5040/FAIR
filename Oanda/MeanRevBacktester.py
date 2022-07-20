@@ -90,7 +90,7 @@ class MeanRevBacktester():
         ''' Backtests the Bollinger Bands-based trading strategy.
         '''
         data = self.data.copy().dropna()
-        data["distance"] = data.price - data.SMA
+        data["distance"] = data.price - data.MSMA
         data["position"] = np.where(data.price < data.Lower, 1, np.nan)
         data["position"] = np.where(data.price > data.Upper, -1, data["position"])
         data["position"] = np.where(data.distance * data.distance.shift(1) < 0, 0, data["position"])

@@ -87,12 +87,13 @@ def thread_SMAC(pill2kill, ticks: list, indicators: dict):
     global smas, smal, sma_updater, smas_value, smal_value
 
     # Wait if there are not enough elements
-    while len(ticks) < 100 and not pill2kill.wait(1.5):
+    while len(ticks) < 70 and not pill2kill.wait(1.5):
         print("[THREAD - SMAC] - Waiting for ticks\n")
+        print(f't {ticks}')
 
     print("[THREAD - SMAC] - Computing values\n")
     tester = smacb.SMACBacktester(ticks=ticks)
-    print(tester.optimize_parameters((1, 20, 1), (21, 100, 1)))
+    print(tester.optimize_parameters((1, 20, 1), (21, 70, 1)))
     sma_updater = pickle.load(open("sma_update.pkl", "rb"))
     smas = sma_updater[0]
     smal = sma_updater[1]
@@ -117,7 +118,7 @@ def thread_SMAC_update(pill2kill, ticks: list, indicators: dict):
     global smas, smal, sma_updater, smas_value, smal_value
 
     # Wait if there are not enough elements
-    while len(ticks) < 100 and not pill2kill.wait(1.5):
+    while len(ticks) < 70 and not pill2kill.wait(1.5):
         print("[THREAD - SMAC] - Waiting for ticks\n")
 
     print("[THREAD - SMAC] - Computing values\n")
@@ -125,7 +126,7 @@ def thread_SMAC_update(pill2kill, ticks: list, indicators: dict):
 
 
     while not pill2kill.wait(900):
-        print(tester.optimize_parameters((1, 20, 1), (21, 100, 1)))
+        print(tester.optimize_parameters((1, 20, 1), (21, 70, 1)))
         sma_updater = pickle.load(open("sma_update.pkl", "rb"))
         smas = sma_updater[0]
         smal = sma_updater[1]

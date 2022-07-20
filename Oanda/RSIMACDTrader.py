@@ -95,7 +95,7 @@ class SMACTrader(tpqoa.tpqoa):
         df["SMA"] = df[self.instrument].rolling(self.sma).mean()
         df["Lower"] = df["SMA"] - df[self.instrument].rolling(self.sma).std() * self.dev
         df["Upper"] = df["SMA"] + df[self.instrument].rolling(self.sma).std() * self.dev
-        df["distance"] = df[self.instrument] - df.SMA
+        df["distance"] = df[self.instrument] - df.MSMA
         df["bposition"] = np.where(df[self.instrument] < df.Lower, 1, np.nan)
         df["bposition"] = np.where(df[self.instrument] > df.Upper, -1, df["bposition"])
         df["bposition"] = np.where(df.distance * df.distance.shift(1) < 0, 0, df["bposition"])

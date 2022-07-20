@@ -157,7 +157,7 @@ def thread_macd(pill2kill, ticks: list, indicators: dict, trading_data: dict):
 
     # Wait if there are not enough elements
     while len(ticks) < 35 and not pill2kill.wait(1.5):
-        print("[THREAD - MACD] - Waiting for ticks")
+        print("[THREAD - MACD] - Waiting for ticks\n")
 
     print("[THREAD - MACD] - Loading values")
     # First we need to calculate the previous MACDs and SIGNALs

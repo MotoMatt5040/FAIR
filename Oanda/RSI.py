@@ -88,9 +88,9 @@ def thread_RSI(pill2kill, ticks: list, indicators: dict):
 
     # If the list hasn't enough values we wait.
     while len(ticks) < N_for_RSI and not pill2kill.wait(1.5):
-        print("[THREAD - RSI] - Waiting for ticks")
+        print("[THREAD - RSI] - Waiting for ticks\n")
 
-    print("[THREAD - RSI] - Computing values")
+    print("[THREAD - RSI] - Computing values\n")
 
     while not pill2kill.wait(1):
         RSI_value = RSI(ticks[-N_for_RSI:])

@@ -9,31 +9,14 @@ import keyboard
 
 import bot
 
-# logging.basicConfig(level=logging.DEBUG)
-# logging.root.setLevel(logging.DEBUG)
-#
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
-# formatter = logging.Formatter('%(asctime)s:%(name)s:%(funcName)s:%(message)s')
-# file_handler = logging.FileHandler('../logs/main.log')
-# file_handler.setFormatter(formatter)
-# logger.addHandler(file_handler)
-# logger.propagate = False
 
 # Creating a bot
 # TODO Fix bot statement
 # b = bot.Bot(0.01, 5 * 60, "XAUUSD")
-b = bot.Bot(1.0, 60 * 15, "USDJPY!")
+b = bot.Bot(0.2, 60 * 15, "AUDUSD!")
 
 # markets = ['EURUSD', 'GBPUSD', 'XAUUSD', 'USDJPY']
 
-# for market in markets:
-
-
-# with open("login_data.txt", 'r') as f:
-#     lines = f.readlines()
-#     usr = int(lines[0])
-#     password = lines[1]
 
 print('''Which account would you like to use
     1: MT5 Demo

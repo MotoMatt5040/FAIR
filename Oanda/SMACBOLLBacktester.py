@@ -104,7 +104,7 @@ class SMACBOLLBacktester:
         data['sposition'] = np.where(data['SMA_S'] > data['SMA_L'], 1, -1)
         data['strategy'] = data['sposition'].shift(1) * data['returns']
 
-        data["distance"] = data.price - data.SMA
+        data["distance"] = data.price - data.MSMA
         data["bposition"] = np.where(data.price <= data.Lower, 1, np.nan)
         data["bposition"] = np.where(data.price >= data.Upper, -1, data["bposition"])
         data["bposition"] = np.where(data.distance * data.distance.shift(1) < 0, 0, data["bposition"])

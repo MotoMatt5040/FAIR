@@ -38,14 +38,15 @@ def load_ticks(ticks: list, market: str, time_period: int):
     # if so, we take ticks from an earlier date.
     today = datetime.datetime.utcnow().date()
     if today.weekday() >= 5 or today.weekday() == 0: 
-        yesterday = today - datetime.timedelta(days=3)
+        yesterday = today - datetime.timedelta(days=5)
     else:
-        yesterday = today - datetime.timedelta(days=1)
+        yesterday = today - datetime.timedelta(days=5)
 
     # Loading data
     timezone = pytz.timezone("Etc/UTC")
     utc_from = datetime.datetime(int(yesterday.year), int(yesterday.month), int(yesterday.day), tzinfo=timezone)
-    loaded_ticks = mt5.copy_ticks_from(market, utc_from, 300000, mt5.COPY_TICKS_ALL)
+    loaded_ticks = mt5.copy_ticks_from(market, utc_from, 300000 * 15, mt5.COPY_TICKS_ALL)
+    p = mt5.copy_ticks_from()
     # print(mt5.copy_ticks_from(market, utc_from, 300000, mt5.COPY_TICKS_ALL))
     if loaded_ticks is None:
         print("Error loading the ticks")
