@@ -22,7 +22,7 @@ import bot
 
 # Creating a bot
 # TODO Fix bot statement
-b = bot.Bot(1.0, 60 * 5, "EURUSD")
+b = bot.Bot(1.0, 60, "EURUSD")
 # b = bot.Bot(5.0, 60 * 15, "USDJPY!")
 
 # markets = ['EURUSD', 'GBPUSD', 'XAUUSD', 'USDJPY']

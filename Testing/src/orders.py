@@ -4,12 +4,12 @@ import MetaTrader5 as mt5
 
 # Global variables
 THRESHOLD = 1
-MARGIN = 80
-MARGINA = 0
+MARGIN = 50
+TP_MARGIN = 1
 # TODO ADJUST TIME BETWEEN OPERATIONS
 # TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
-TIME_BETWEEN_OPERATIONS = 60 * 5
-STOPLOSS = 80
+TIME_BETWEEN_OPERATIONS = 60
+STOPLOSS = 50
 TAKEPROFIT = 10
 TRAIL_AMOUNT = 50  # 50 pips
 
@@ -73,7 +73,7 @@ def handle_buy(buy, market):
                 "sl": tick.ask - (MARGIN - margin_adjustment) * point,
                 "tp": tp,
                 "deviation": 20,
-                "magic": 235000,
+                "magic": 234000,
                 "comment": "python script open",
                 "type_time": mt5.ORDER_TIME_GTC,
                 "type_filling": mt5.ORDER_FILLING_RETURN,
@@ -83,8 +83,8 @@ def handle_buy(buy, market):
             print(tick.ask - (MARGIN - margin_adjustment) * point)
             move = True
             if move:
-                if margin_adjustment < 80:
-                    margin_adjustment += 7
+                if margin_adjustment < 40:
+                    margin_adjustment += 4
                 # elif margin_adjustment <= 70:
                 #     margin_adjustment = MARGIN - 70
                 # elif margin_adjustment <= 80:
@@ -132,7 +132,7 @@ def handle_sell(sell, market: str):
                 "sl": tick.bid + (MARGIN - margin_adjustment) * point,
                 "tp": tp,
                 "deviation": 20,
-                "magic": 235000,
+                "magic": 234000,
                 "comment": "python script open",
                 "type_time": mt5.ORDER_TIME_GTC,
                 "type_filling": mt5.ORDER_FILLING_RETURN,
@@ -142,8 +142,8 @@ def handle_sell(sell, market: str):
             print(tick.ask - (MARGIN - margin_adjustment) * point)
             move = True
             if move:
-                if margin_adjustment < 80:
-                    margin_adjustment += 7
+                if margin_adjustment < 40:
+                    margin_adjustment += 4
                 # elif margin_adjustment <= 70:
                 #     margin_adjustment = MARGIN - 70
                 # elif margin_adjustment <= 80:
@@ -212,7 +212,7 @@ def open_buy(trading_data: dict):
         "sl": price - STOPLOSS * point,
         "tp": price + TAKEPROFIT * point,
         "deviation": deviation,
-        "magic": 235000,
+        "magic": 234000,
         "comment": "python script open",
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_IOC,
@@ -280,7 +280,7 @@ def open_sell(trading_data: dict):
         "sl": price + STOPLOSS * point,
         "tp": price - TAKEPROFIT * point,
         "deviation": deviation,
-        "magic": 235000,
+        "magic": 234000,
         "comment": "python script open",
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_IOC,
