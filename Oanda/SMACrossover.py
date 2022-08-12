@@ -89,7 +89,7 @@ def thread_SMAC(pill2kill, ticks: list, indicators: dict):
     # Wait if there are not enough elements
     while len(ticks) < 70 and not pill2kill.wait(1.5):
         print("[THREAD - SMAC] - Waiting for ticks\n")
-        print(f't {ticks}')
+        # print(f't {ticks}')
 
     print("[THREAD - SMAC] - Computing values\n")
     tester = smacb.SMACBacktester(ticks=ticks)

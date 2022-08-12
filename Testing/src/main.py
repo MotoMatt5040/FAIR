@@ -22,7 +22,7 @@ import bot
 
 # Creating a bot
 # TODO Fix bot statement
-b = bot.Bot(1.0, 60 * 15, "EURUSD!")
+b = bot.Bot(1.0, 60 * 5, "EURUSD")
 # b = bot.Bot(5.0, 60 * 15, "USDJPY!")
 
 # markets = ['EURUSD', 'GBPUSD', 'XAUUSD', 'USDJPY']
@@ -38,7 +38,8 @@ b = bot.Bot(1.0, 60 * 15, "EURUSD!")
 print('''Which account would you like to use
     1: MT5 Demo
     2: Hanko Demo
-    3: Traders Domain - Live''')
+    3: Traders Domain - Live
+    4: Vital Markets - Demo''')
 usr = None
 password = None
 while usr is None or password is None:
@@ -54,13 +55,17 @@ while usr is None or password is None:
         usr = 10035241
         password = 'R3k5tpbz'
         print(f'\nYou selected: {usr}\n')
+    elif keyboard.is_pressed('4'):
+        usr = 177589
+        password = 'dUPWbjejDq'
+        print(f'\nYou selected: {usr}\n')
 
 time.sleep(0.1)
 print('''Which server would you like to connect to?
     1: MetaQuotes-Demo
     2: OANDA-Demo-2
-    3: Hankotrade-Demo
-    4: TradersDomainFX-MetaTrader5''')
+    3: TradersDomainFX-MetaTrader5
+    4: VitalMarkets-Demo''')
 server = None
 while server is None:
     if keyboard.is_pressed('1'):
@@ -70,10 +75,10 @@ while server is None:
         server = 'OANDA-Demo-2'
         print(f'\nYou selected: {server}\n')
     elif keyboard.is_pressed('3'):
-        server = 'Hankotrade-Demo'
+        server = 'TradersDomainFX-MetaTrader5'
         print(f'\nYou selected: {server}\n')
     elif keyboard.is_pressed('4'):
-        server = 'TradersDomainFX-MetaTrader5'
+        server = 'VitalMarkets-Demo'
         print(f'\nYou selected: {server}\n')
 
 # # Login into mt5
@@ -82,9 +87,10 @@ if not b.mt5_login(usr, password, server):
 # b.oanda_login()
 b.thread_tick_reader()
 b.thread_slope_abs_rel()
-# b.thread_MACD()
-# b.thread_RSI()
-b.thread_SMAC()
+b.thread_MACD()
+b.thread_RSI()
+# b.thread_SMAC()
+# b.thread_MOMENTUM()
 b.thread_orders()
 b.wait()
 

@@ -38,9 +38,9 @@ def load_ticks(ticks: list, market: str, time_period: int):
     # if so, we take ticks from an earlier date.
     today = datetime.datetime.utcnow().date()
     if today.weekday() >= 5 or today.weekday() == 0: 
-        yesterday = today - datetime.timedelta(days=3)
+        yesterday = today - datetime.timedelta(days=365)
     else:
-        yesterday = today - datetime.timedelta(days=1)
+        yesterday = today - datetime.timedelta(days=365)
 
     # Loading data
     timezone = pytz.timezone("Etc/UTC")
@@ -105,3 +105,4 @@ def thread_tick_reader(pill2kill, ticks: list, trading_data: dict):
         # The last tick is going to be changed all the time with the actual one
         ticks[-1] = mt5.symbol_info_tick(trading_data['market']).ask
         i += 1
+        # print(ticks[-3], ticks[-2], ticks[-1])

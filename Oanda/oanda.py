@@ -11,7 +11,7 @@ from datetime import date, timedelta, datetime
 
 # contrader = ct.ConTrader("oanda.cfg", "EUR_USD", "1min", window=1, units=100000)
 
-# bolltrader = bt.BollTrader("oanda.cfg", "EUR_USD", "1min", sma=20, dev=1, units=100000)
+bolltrader = bt.BollTrader("oanda.cfg", "EUR_USD", "1min", sma=20, dev=1, units=100000)
 
 lm = pickle.load(open("logreg.pkl", "rb"))
 lags = pickle.load(open("lags.pkl", "rb"))
@@ -24,7 +24,7 @@ print(sma_updater, sma_updater[0], sma_updater[1])
 print(str(datetime.now() - timedelta(hours=1))[:-7])
 print(datetime.now())
 
-smatrader = st.SMACTrader("oanda.cfg", "AUD_USD", "15min", smas=sma_updater[0], smal=sma_updater[1], units=500000)
+smatrader = st.SMACTrader("oanda.cfg", "AUD_USD", "15min", smas=sma_updater[0], smal=sma_updater[1], units=100000)
 # smau = smabt.SMABacktester(instrument='EUR_USD', start=str(date.today() - timedelta(1)), end=str(date.today()), granularity='M1', price='B', SMA_S=37, SMA_L=1)
 smau = smabt.SMABacktester(instrument='EUR_USD', start=str(datetime.now() - timedelta(days=7))[:-7],
                            end=str(datetime.now())[:-7], granularity='M15', price='B', SMA_S=37, SMA_L=1)
@@ -72,6 +72,7 @@ def sma_trading():
 if __name__ == '__main__':
     sma_trading()
     # ml_trading()
+    pass
 
 # pickle.dump(trader.model, open("logreg.pkl", "wb"))
 

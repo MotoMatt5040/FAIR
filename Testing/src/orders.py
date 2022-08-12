@@ -1,20 +1,20 @@
-import MACD, RSI, SMACrossover, time
+import MACD, RSI, SMACrossover, time, Momentum
 import datetime as date
 import MetaTrader5 as mt5
 
 # Global variables
-THRESHOLD = 5
-MARGIN = 100
+THRESHOLD = 1
+MARGIN = 80
+MARGINA = 0
 # TODO ADJUST TIME BETWEEN OPERATIONS
 # TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
-TIME_BETWEEN_OPERATIONS = 10 * 60
-STOPLOSS = 100
-TAKEPROFIT = 200
+TIME_BETWEEN_OPERATIONS = 60 * 5
+STOPLOSS = 80
+TAKEPROFIT = 10
 TRAIL_AMOUNT = 50  # 50 pips
 
 
 def handle_stoploss(order: int, position):
-
     # ticket = position.ticket
     # symbol = position.symbol
     # order_type = position.type
@@ -53,9 +53,16 @@ def handle_buy(buy, market):
         buy : Buy operation.
         market (str): Market where the operation was openned.
     """
+    SMACrossover.set_cross(False)
     position = mt5.positions_get(symbol=market)[-1].ticket
     point = mt5.symbol_info(market).point
     GOAL = buy['price'] + point * THRESHOLD
+    tp = buy['price'] + TAKEPROFIT * point
+    print(buy['price'])
+    print(tp)
+    print(point)
+    moves = 0
+    margin_adjustment = 0
     while True:
         tick = mt5.symbol_info_tick(market)
         if tick.ask >= GOAL:
@@ -63,8 +70,8 @@ def handle_buy(buy, market):
             request = {
                 "action": mt5.TRADE_ACTION_SLTP,
                 "symbol": market,
-                "sl": tick.ask - MARGIN * point,
-                "tp": tick.ask + MARGIN * point,
+                "sl": tick.ask - (MARGIN - margin_adjustment) * point,
+                "tp": tp,
                 "deviation": 20,
                 "magic": 235000,
                 "comment": "python script open",
@@ -73,7 +80,21 @@ def handle_buy(buy, market):
                 "position": position
             }
             GOAL = tick.ask + 1 * point
+            print(tick.ask - (MARGIN - margin_adjustment) * point)
+            move = True
+            if move:
+                if margin_adjustment < 80:
+                    margin_adjustment += 7
+                # elif margin_adjustment <= 70:
+                #     margin_adjustment = MARGIN - 70
+                # elif margin_adjustment <= 80:
+                #     margin_adjustment = MARGIN - 40
+                # elif margin_adjustment > 80:
+                #     margin_adjustment = MARGIN - 20
+                print(MARGIN - margin_adjustment)
+                move = False
             mt5.order_send(request)
+        # print(tick.ask * point)
 
         # print(f'position: {mt5.positions_get(ticket=position)}')
         # We check if the operation has been closed in order to leave the function
@@ -92,9 +113,15 @@ def handle_sell(sell, market: str):
         sell : Sell operation.
         market (str): Market where the operation was openned.
     """
+    SMACrossover.set_cross(False)
     position = mt5.positions_get(symbol=market)[-1].ticket
     point = mt5.symbol_info(market).point
     GOAL = sell['price'] - point * THRESHOLD
+    tp = sell['price'] - TAKEPROFIT * point
+    print(sell['price'])
+    print(tp)
+    margin_adjustment = 0
+    moves = 0
     while True:
         tick = mt5.symbol_info_tick(market)
         if tick.bid <= GOAL:
@@ -102,8 +129,8 @@ def handle_sell(sell, market: str):
             request = {
                 "action": mt5.TRADE_ACTION_SLTP,
                 "symbol": market,
-                "sl": tick.bid + MARGIN * point,
-                "tp": tick.bid - MARGIN * point,
+                "sl": tick.bid + (MARGIN - margin_adjustment) * point,
+                "tp": tp,
                 "deviation": 20,
                 "magic": 235000,
                 "comment": "python script open",
@@ -112,7 +139,22 @@ def handle_sell(sell, market: str):
                 "position": position
             }
             GOAL = tick.bid - 1 * point
+            print(tick.ask - (MARGIN - margin_adjustment) * point)
+            move = True
+            if move:
+                if margin_adjustment < 80:
+                    margin_adjustment += 7
+                # elif margin_adjustment <= 70:
+                #     margin_adjustment = MARGIN - 70
+                # elif margin_adjustment <= 80:
+                #     margin_adjustment = MARGIN - 40
+                # elif margin_adjustment > 80:
+                #     margin_adjustment = MARGIN - 20
+                print(MARGIN - margin_adjustment)
+                move = False
             mt5.order_send(request)
+        # print(tick.ask * point)
+
         # print(f'position: {mt5.positions_get(ticket=position)}')
         # We check if the operation has been closed in order to leave the function
         if len(mt5.positions_get(ticket=position)) == 0:
@@ -140,7 +182,7 @@ def open_buy(trading_data: dict):
     counter = 0
     # We only open the operation if the spread is 0
     # we check the spread 300000 times
-    while symbol_info.spread > 25 and counter < 300000:
+    while symbol_info.spread > 9 and counter < 300000:
         counter += 1
         symbol_info = mt5.symbol_info(trading_data['market'])
 
@@ -208,7 +250,7 @@ def open_sell(trading_data: dict):
     counter = 0
     # We only open the operation if the spread is 0
     # we check the spread 300000 times
-    while symbol_info.spread > 25 and counter < 300000:
+    while symbol_info.spread > 9 and counter < 300000:
         counter += 1
         symbol_info = mt5.symbol_info(trading_data['market'])
 
@@ -267,10 +309,10 @@ def check_buy() -> bool:
     """
     # TODO REMOVE PRINT LINES
     # print(MACD.check_buy(), RSI.check_buy())
-    # return MACD.check_buy() and RSI.check_buy()
+    return MACD.check_buy() and RSI.check_buy()
     # TODO FIX RETURN STATEMENT
     # return True
-    return SMACrossover.check_buy()
+    # return SMACrossover.check_buy()
 
 def check_sell() -> bool:
     """Function to check if we can open a sell.
@@ -279,9 +321,9 @@ def check_sell() -> bool:
         bool: True if we can, false if not.
     """
     # TODO FIX RETURN STATEMENT
-    # return MACD.check_sell() and RSI.check_sell()
+    return MACD.check_sell() and RSI.check_sell()
     # return True
-    return SMACrossover.check_sell()
+    # return SMACrossover.check_sell()
 
 def thread_orders(pill2kill, trading_data: dict):
     """Function executed by a thread. It opens and handles operations.

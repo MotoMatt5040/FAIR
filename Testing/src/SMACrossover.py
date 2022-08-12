@@ -1,6 +1,7 @@
 import time
 import SMACBacktester as smacb
 import pickle
+import numpy as np
 
 sma_updater = None
 
@@ -8,6 +9,15 @@ smas = None
 smal = None
 smas_value = None
 smal_value = None
+smas_store = []
+smal_store = []
+direction = []
+move = []
+pos = [0,0,0]
+buy = False
+sell = False
+cross = False
+
 
 
 def check_buy() -> bool:
@@ -17,15 +27,29 @@ def check_buy() -> bool:
     Returns:
         bool: True if SMACrossover allows, false if not.
     """
-    if smal_value == None or smas_value == None:
+    global sell, cross, buy
+
+    # print(f'Check Buy:\n    cross: {cross}\n    buy: {buy}\n    sell: {sell}')
+
+    if smal_value is None or smas_value is None:
         return False
 
     if smal_value > smas_value:
-        # print(f"Don't buy: {smal_value} > {smas_value}")
-        return False
+        # print(f'{smas_value} | {smal_value}')
+        buy = True
+        # if buy and sell:
+        #     cross = True
+        #     sell = False
+        # if cross:
+        #     return buy
+        # else:
+        #     return False
+        return buy
     elif smas_value > smal_value:
-        # print(f"Buy: {smas_value} > {smal_value}")
-        return True
+        buy = False
+
+        return buy
+
     return False
 
 
@@ -36,16 +60,38 @@ def check_sell() -> bool:
     Returns:
         bool: True if SMACrossover allows, false if not.
     """
-    if smal_value == None or smas_value == None:
+    global buy, cross, sell
+    # print(f'Check Sell:\n    cross: {cross}\n    buy: {buy}\n    sell: {sell}')
+
+    if smal_value is None or smas_value is None:
         return False
 
     if smal_value < smas_value:
-        # print(f"Don't sell: {smal_value} < {smas_value}")
-        return False
+        sell = True
+        # if buy and sell:
+        #     cross = True
+        #     buy = False
+        # if cross:
+        #     return sell
+        # else:
+        #     return False
+        return sell
     elif smas_value < smal_value:
+        sell = False
         # print(f"Sell: {smas_value} < {smal_value}")
-        return True
+        return sell
     return False
+
+
+def momentum(ticks):
+    pos[0] = ticks[0] - ticks[1]
+    pos[1] = ticks[1] - ticks[2]
+    pos[2] = ticks[2] - ticks[3]
+
+    sign = np.sign(pos)
+    # print(sign)
+
+    return sign
 
 
 def SMAL(ticks):
@@ -98,6 +144,8 @@ def thread_SMAC(pill2kill, ticks: list, indicators: dict):
     smal = sma_updater[1]
 
     while not pill2kill.wait(1):
+        momentum(ticks[::-1])
+
         smas_value = SMAS(ticks[::-1])
         smal_value = SMAL(ticks[::-1])
         indicators['SMAC']['SMAS'] = smas_value
@@ -134,3 +182,6 @@ def thread_SMAC_update(pill2kill, ticks: list, indicators: dict):
         indicators['SMAC']['SMAS'] = smas_value
         indicators['SMAC']['SMAL'] = smal_value
 
+def set_cross(cross_):
+    global cross
+    cross = cross_
