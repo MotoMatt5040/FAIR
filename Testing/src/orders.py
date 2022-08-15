@@ -4,13 +4,13 @@ import MetaTrader5 as mt5
 
 # Global variables
 THRESHOLD = 1
-MARGIN = 50
+MARGIN = 20
 TP_MARGIN = 1
 # TODO ADJUST TIME BETWEEN OPERATIONS
 # TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
 TIME_BETWEEN_OPERATIONS = 60
-STOPLOSS = 50
-TAKEPROFIT = 10
+STOPLOSS = 200
+TAKEPROFIT = 20
 TRAIL_AMOUNT = 50  # 50 pips
 
 
@@ -83,8 +83,8 @@ def handle_buy(buy, market):
             print(tick.ask - (MARGIN - margin_adjustment) * point)
             move = True
             if move:
-                if margin_adjustment < 40:
-                    margin_adjustment += 4
+                if margin_adjustment < 380:
+                    margin_adjustment += 1
                 # elif margin_adjustment <= 70:
                 #     margin_adjustment = MARGIN - 70
                 # elif margin_adjustment <= 80:
@@ -142,8 +142,8 @@ def handle_sell(sell, market: str):
             print(tick.ask - (MARGIN - margin_adjustment) * point)
             move = True
             if move:
-                if margin_adjustment < 40:
-                    margin_adjustment += 4
+                if margin_adjustment < 380:
+                    margin_adjustment += 1
                 # elif margin_adjustment <= 70:
                 #     margin_adjustment = MARGIN - 70
                 # elif margin_adjustment <= 80:
@@ -349,7 +349,7 @@ def thread_orders(pill2kill, trading_data: dict):
                 now = date.datetime.now()
                 dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
                 print("[Thread - orders] Buy open -", dt_string)
-                handle_buy(buy, trading_data['market'])
+                # handle_buy(buy, trading_data['market'])
                 buy = None
 
         if check_sell() and last_operation > TIME_BETWEEN_OPERATIONS:
@@ -360,7 +360,7 @@ def thread_orders(pill2kill, trading_data: dict):
                 now = date.datetime.now()
                 dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
                 print("[Thread - orders] Sell open -", dt_string)
-                handle_sell(sell, trading_data['market'])
+                # handle_sell(sell, trading_data['market'])
                 sell = None
 
         last_operation += 1

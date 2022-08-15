@@ -1,5 +1,5 @@
 # Global variables
-N_for_RSI = 14
+N_for_RSI = 10
 RSI_value = None
 
 

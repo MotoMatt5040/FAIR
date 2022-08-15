@@ -9,7 +9,13 @@ PREV_EMA9 = None
 PREV_EMA12 = None
 PREV_EMA26 = None
 
-MAX_LEN = 9
+ema_fast = 12
+ema_slow = 26
+# smooth = 5
+
+MAX_LEN = 9  # 9
+
+# TODO MAX_LEN = 9, ema_fast = 12, ema_slow = 26
 
 
 def check_buy() -> bool:
@@ -84,8 +90,9 @@ def EMA(ticks: list, n: int):
     """
     global PREV_EMA12, PREV_EMA26, PREV_EMA9
 
-    if n != 12 and n != 26 and n != 9:
-        print("EMA function: N must be 12 or 26 or 9")
+    # if n != 12 and n != 26 and n != 9:
+    if n != ema_fast and n != ema_slow and n != MAX_LEN:
+        print(f"EMA function: N must be {ema_fast} or {ema_slow} or {MAX_LEN}")
 
     # Not enough ticks in the list
     if n > len(ticks): return None
@@ -94,14 +101,14 @@ def EMA(ticks: list, n: int):
 
     # Checking if the previous EMA has been calculated
     prev_ema = 0
-    if n == 12:
+    if n == ema_fast:
         if PREV_EMA12 is None:
             prev_ema = SMA(ticks)
         else:
             prev_ema = PREV_EMA12
         ema = (ticks[-1] - prev_ema) * k + prev_ema
         PREV_EMA12 = ema
-    elif n == 26:
+    elif n == ema_slow:
         if PREV_EMA26 is None:
             prev_ema = SMA(ticks)
         else:
@@ -128,7 +135,7 @@ def MACD(ticks):
     Returns:
         float: Value of the MACD.
     """
-    return EMA(ticks[-12:], 12) - EMA(ticks[-26:], 26)
+    return EMA(ticks[-ema_fast:], ema_fast) - EMA(ticks[-ema_slow:], ema_slow)
 
 
 def SIGNAL(values_list):
@@ -140,7 +147,7 @@ def SIGNAL(values_list):
     Returns:
         float: Value of the SIGNAL.
     """
-    return EMA(values_list[-9:], 9)
+    return EMA(values_list[-MAX_LEN:], MAX_LEN)
 
 
 def thread_macd(pill2kill, ticks: list, indicators: dict, trading_data: dict):
@@ -161,7 +168,7 @@ def thread_macd(pill2kill, ticks: list, indicators: dict, trading_data: dict):
 
     print("[THREAD - MACD] - Loading values")
     # First we need to calculate the previous MACDs and SIGNALs
-    i = 26
+    i = ema_slow
     while i < len(ticks):
         # Computing the MACD
         PREV_MACD = CUR_MACD
@@ -171,13 +178,13 @@ def thread_macd(pill2kill, ticks: list, indicators: dict, trading_data: dict):
         i += 1
 
         # Computing the SIGNAL
-        if len(MACDs) < 9:
+        if len(MACDs) < MAX_LEN:
             continue
         else:
             PREV_SIGNAL = CUR_SIGNAL
             CUR_SIGNAL = SIGNAL(MACDs)
 
-        if len(MACDs) > 9:
+        if len(MACDs) > MAX_LEN:
             del MACDs[0]
 
     # Main thread loop
@@ -186,7 +193,7 @@ def thread_macd(pill2kill, ticks: list, indicators: dict, trading_data: dict):
     while not pill2kill.wait(1):
         # Computing the MACD
         PREV_MACD = CUR_MACD
-        CUR_MACD = MACD(ticks[-26:])
+        CUR_MACD = MACD(ticks[-ema_slow:])
 
         # Only append a MACD value every time period
         if i >= trading_data['time_period']:
@@ -206,5 +213,5 @@ def thread_macd(pill2kill, ticks: list, indicators: dict, trading_data: dict):
         # TODO REMOVE PRINT LINE
         # print(PREV_MACD, PREV_SIGNAL, CUR_MACD, CUR_SIGNAL)
 
-        if len(MACDs) > 9:
+        if len(MACDs) > MAX_LEN:
             del MACDs[0]
