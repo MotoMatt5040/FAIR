@@ -9,8 +9,8 @@ TP_MARGIN = 1
 # TODO ADJUST TIME BETWEEN OPERATIONS
 # TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
 TIME_BETWEEN_OPERATIONS = 60
-STOPLOSS = 200
-TAKEPROFIT = 20
+STOPLOSS = 300
+TAKEPROFIT = 150
 TRAIL_AMOUNT = 50  # 50 pips
 
 
@@ -182,7 +182,7 @@ def open_buy(trading_data: dict):
     counter = 0
     # We only open the operation if the spread is 0
     # we check the spread 300000 times
-    while symbol_info.spread > 9 and counter < 300000:
+    while symbol_info.spread > 11 and counter < 300000:
         counter += 1
         symbol_info = mt5.symbol_info(trading_data['market'])
 
@@ -250,7 +250,7 @@ def open_sell(trading_data: dict):
     counter = 0
     # We only open the operation if the spread is 0
     # we check the spread 300000 times
-    while symbol_info.spread > 9 and counter < 300000:
+    while symbol_info.spread > 11 and counter < 300000:
         counter += 1
         symbol_info = mt5.symbol_info(trading_data['market'])
 
