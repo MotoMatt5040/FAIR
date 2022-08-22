@@ -1,5 +1,5 @@
 # FAIR (Forex AI Repository) Project
-# V 1.0
+# V 2.0
 # 5/10/2022
 
 import logging
