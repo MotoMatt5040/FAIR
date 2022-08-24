@@ -22,7 +22,7 @@ import bot
 
 # Creating a bot
 # TODO Fix bot statement
-b = bot.Bot(5.0, 60 * 5, "USDJPY")
+b = bot.Bot(10.0, 60, "EURUSD")
 # b = bot.Bot(5.0, 60 * 15, "USDJPY!")
 
 # markets = ['EURUSD', 'GBPUSD', 'XAUUSD', 'USDJPY']
@@ -56,8 +56,8 @@ while usr is None or password is None:
         password = 'R3k5tpbz'
         print(f'\nYou selected: {usr}\n')
     elif keyboard.is_pressed('4'):
-        usr = 179509
-        password = 'UhsjTMQvkg'
+        usr = 181241
+        password = 'xVUyTgQdGY'
         print(f'\nYou selected: {usr}\n')
 
 time.sleep(0.1)
