@@ -309,7 +309,7 @@ def check_buy() -> bool:
     """
     # TODO REMOVE PRINT LINES
     # print(MACD.check_buy(), RSI.check_buy())
-    return MACD.check_buy()# and RSI.check_buy()
+    return MACD.check_buy() and RSI.check_buy()
     # TODO FIX RETURN STATEMENT
     # return True
     # return SMACrossover.check_buy()
@@ -321,7 +321,7 @@ def check_sell() -> bool:
         bool: True if we can, false if not.
     """
     # TODO FIX RETURN STATEMENT
-    return MACD.check_sell()# and RSI.check_sell()
+    return MACD.check_sell() and RSI.check_sell()
     # return True
     # return SMACrossover.check_sell()
 
