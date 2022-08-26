@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from itertools import product
-import tpqoa
+# import tpqoa
 from datetime import date, timedelta, datetime
 import keyboard
 import pickle
