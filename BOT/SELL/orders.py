@@ -1,4 +1,4 @@
-import MACD, RSI, SMACrossover, time, Momentum
+import MACD, RSI, time
 import datetime as date
 import MetaTrader5 as mt5
 

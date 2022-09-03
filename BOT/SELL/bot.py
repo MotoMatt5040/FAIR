@@ -1,7 +1,7 @@
 import threading
 import MetaTrader5 as mt5
 import tick_reader, slope_abs_rel, orders
-import MACD, RSI, SMACrossover, Momentum
+import MACD, RSI
 # import tpqoa
 
 
