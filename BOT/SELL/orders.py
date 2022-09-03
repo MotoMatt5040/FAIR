@@ -337,6 +337,12 @@ def thread_orders(pill2kill, trading_data: dict):
 
     last_operation = 0
     print("[THREAD - orders] - Checking operations\n")
+    initialized = False
+
+    if not initialized:
+        for i in range(5):
+            buy = open_buy(trading_data)
+
     while not pill2kill.wait(0.1):
         # TODO REMOVE PRINT STATEMENT
         # print(check_buy(), check_sell(), last_operation, TIME_BETWEEN_OPERATIONS)
