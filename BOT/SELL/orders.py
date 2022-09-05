@@ -53,7 +53,6 @@ def handle_buy(buy, market):
         buy : Buy operation.
         market (str): Market where the operation was openned.
     """
-    SMACrossover.set_cross(False)
     position = mt5.positions_get(symbol=market)[-1].ticket
     point = mt5.symbol_info(market).point
     GOAL = buy['price'] + point * THRESHOLD
@@ -113,7 +112,6 @@ def handle_sell(sell, market: str):
         sell : Sell operation.
         market (str): Market where the operation was openned.
     """
-    SMACrossover.set_cross(False)
     position = mt5.positions_get(symbol=market)[-1].ticket
     point = mt5.symbol_info(market).point
     GOAL = sell['price'] - point * THRESHOLD
@@ -341,7 +339,7 @@ def thread_orders(pill2kill, trading_data: dict):
 
     if not initialized:
         for i in range(5):
-            buy = open_buy(trading_data)
+            buy = open_sell(trading_data)
 
     while not pill2kill.wait(0.1):
         # TODO REMOVE PRINT STATEMENT

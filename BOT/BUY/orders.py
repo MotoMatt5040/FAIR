@@ -53,7 +53,7 @@ def handle_buy(buy, market):
         buy : Buy operation.
         market (str): Market where the operation was openned.
     """
-    SMACrossover.set_cross(False)
+
     position = mt5.positions_get(symbol=market)[-1].ticket
     point = mt5.symbol_info(market).point
     GOAL = buy['price'] + point * THRESHOLD
@@ -113,7 +113,6 @@ def handle_sell(sell, market: str):
         sell : Sell operation.
         market (str): Market where the operation was openned.
     """
-    SMACrossover.set_cross(False)
     position = mt5.positions_get(symbol=market)[-1].ticket
     point = mt5.symbol_info(market).point
     GOAL = sell['price'] - point * THRESHOLD
