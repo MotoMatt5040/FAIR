@@ -11,16 +11,16 @@ import bot
 
 # Creating a bot
 # TODO Fix bot statement
-b = bot.Bot(0.01, 60, "EURUSD")
+b = bot.Bot(0.1, 60, "EURUSD")
 # b = bot.Bot(5.0, 60 * 15, "USDJPY!")
 
 #dakota
-# usr = 10024165
-# password = 'mCUBPFKnQf'
+usr = 10024165
+password = 'mCUBPFKnQf'
 
 #matt
-usr = 10024028
-password = 'qMnkbKzXHG'
+# usr = 10024028
+# password = 'qMnkbKzXHG'
 
 server = 'VitalMarkets-Live'
 
