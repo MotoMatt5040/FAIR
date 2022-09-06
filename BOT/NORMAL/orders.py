@@ -1,6 +1,7 @@
 import MACD, RSI, time
 import datetime as date
 import MetaTrader5 as mt5
+import keyboard
 
 # Global variables
 THRESHOLD = 1
@@ -53,7 +54,6 @@ def handle_buy(buy, market):
         buy : Buy operation.
         market (str): Market where the operation was openned.
     """
-    SMACrossover.set_cross(False)
     position = mt5.positions_get(symbol=market)[-1].ticket
     point = mt5.symbol_info(market).point
     GOAL = buy['price'] + point * THRESHOLD
@@ -113,7 +113,6 @@ def handle_sell(sell, market: str):
         sell : Sell operation.
         market (str): Market where the operation was openned.
     """
-    SMACrossover.set_cross(False)
     position = mt5.positions_get(symbol=market)[-1].ticket
     point = mt5.symbol_info(market).point
     GOAL = sell['price'] - point * THRESHOLD
@@ -339,16 +338,31 @@ def thread_orders(pill2kill, trading_data: dict):
     print("[THREAD - orders] - Checking operations\n")
     initialized = False
 
+#     print("""Buy: 1
+# Sell: 2""")
+#
+#     order = None
+#     while order is None:
+#         if keyboard.is_pressed('1'):
+#             order = 1
+#         elif keyboard.is_pressed('2'):
+#             order = 2
+
     if not initialized:
         for i in range(5):
-            buy = open_buy(trading_data)
+            time.sleep(.1)
+            # if order == 1:
+            #     buy = open_buy(trading_data)
+            # elif order == 2:
+            sell = open_sell(trading_data)
+        initialized = True
 
     while not pill2kill.wait(0.1):
         # TODO REMOVE PRINT STATEMENT
         # print(check_buy(), check_sell(), last_operation, TIME_BETWEEN_OPERATIONS)
         order = 2
         if check_buy() and last_operation > TIME_BETWEEN_OPERATIONS:
-            buy = open_buy(trading_data)
+            buy = open_sell(trading_data)
             last_operation = 0
             if buy is not None:
                 order = 0
