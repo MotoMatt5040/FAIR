@@ -338,25 +338,25 @@ def thread_orders(pill2kill, trading_data: dict):
     last_operation = 0
     print("[THREAD - orders] - Checking operations\n")
     initialized = False
-
-    print("""Buy: 1
-Sell: 2""")
-
-    order = None
-    while order is None:
-        if keyboard.is_pressed('1'):
-            order = 1
-        elif keyboard.is_pressed('2'):
-            order = 2
+#
+#     print("""Buy: 1
+# Sell: 2""")
+#
+    # order = None
+    # while order is None:
+    #     if keyboard.is_pressed('1'):
+    #         order = 1
+    #     elif keyboard.is_pressed('2'):
+    #         order = 2
 
 
     if not initialized:
         for i in range(5):
             time.sleep(.1)
-            if order == 1:
-                buy = open_buy(trading_data)
-            elif order == 2:
-                sell = open_sell(trading_data)
+            # if order == 1:
+            buy = open_buy(trading_data)
+            # elif order == 2:
+            #     sell = open_sell(trading_data)
         initialized = True
 
     while not pill2kill.wait(0.1):
@@ -375,7 +375,7 @@ Sell: 2""")
                 buy = None
 
         if check_buy() and last_operation > TIME_BETWEEN_OPERATIONS:
-            sell = open_sell(trading_data)
+            sell = open_buy(trading_data)
             last_operation = 0
             if sell is not None:
                 order = 2
