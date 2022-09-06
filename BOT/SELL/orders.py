@@ -93,7 +93,7 @@ def handle_buy(buy, market):
                 #     margin_adjustment = MARGIN - 20
                 print(MARGIN - margin_adjustment)
                 move = False
-            mt5.order_send(request)
+            # mt5.order_send(request)
         # print(tick.ask * point)
 
         # print(f'position: {mt5.positions_get(ticket=position)}')
@@ -151,7 +151,7 @@ def handle_sell(sell, market: str):
                 #     margin_adjustment = MARGIN - 20
                 print(MARGIN - margin_adjustment)
                 move = False
-            mt5.order_send(request)
+            # mt5.order_send(request)
         # print(tick.ask * point)
 
         # print(f'position: {mt5.positions_get(ticket=position)}')
@@ -349,7 +349,7 @@ def thread_orders(pill2kill, trading_data: dict):
 #             order = 2
 
     if not initialized:
-        for i in range(5):
+        for i in range(2):
             time.sleep(.1)
             # if order == 1:
             #     buy = open_buy(trading_data)
@@ -369,7 +369,7 @@ def thread_orders(pill2kill, trading_data: dict):
                 now = date.datetime.now()
                 dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
                 print("[Thread - orders] Buy open -", dt_string)
-                # handle_buy(buy, trading_data['market'])
+                handle_sell(buy, trading_data['market'])
                 buy = None
 
         if check_sell() and last_operation > TIME_BETWEEN_OPERATIONS:
@@ -380,7 +380,7 @@ def thread_orders(pill2kill, trading_data: dict):
                 now = date.datetime.now()
                 dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
                 print("[Thread - orders] Sell open -", dt_string)
-                # handle_sell(sell, trading_data['market'])
+                handle_sell(sell, trading_data['market'])
                 sell = None
 
         last_operation += 1
