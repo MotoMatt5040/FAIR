@@ -11,7 +11,7 @@ import bot
 
 # Creating a bot
 # TODO Fix bot statement
-b = bot.Bot(0.1, 60, "EURUSD")
+b = bot.Bot(0.1, 60, "US30")
 # b = bot.Bot(5.0, 60 * 15, "USDJPY!")
 
 #dakota

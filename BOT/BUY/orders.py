@@ -54,6 +54,7 @@ def handle_buy(buy, market):
         buy : Buy operation.
         market (str): Market where the operation was openned.
     """
+
     position = mt5.positions_get(symbol=market)[-1].ticket
     point = mt5.symbol_info(market).point
     GOAL = buy['price'] + point * THRESHOLD
@@ -181,7 +182,7 @@ def open_buy(trading_data: dict):
     counter = 0
     # We only open the operation if the spread is 0
     # we check the spread 300000 times
-    while symbol_info.spread > 11 and counter < 300000:
+    while symbol_info.spread > 220 and counter < 300000:
         counter += 1
         symbol_info = mt5.symbol_info(trading_data['market'])
 
@@ -249,7 +250,7 @@ def open_sell(trading_data: dict):
     counter = 0
     # We only open the operation if the spread is 0
     # we check the spread 300000 times
-    while symbol_info.spread > 11 and counter < 300000:
+    while symbol_info.spread > 220 and counter < 300000:
         counter += 1
         symbol_info = mt5.symbol_info(trading_data['market'])
 
@@ -337,32 +338,33 @@ def thread_orders(pill2kill, trading_data: dict):
     last_operation = 0
     print("[THREAD - orders] - Checking operations\n")
     initialized = False
-
+#
 #     print("""Buy: 1
 # Sell: 2""")
 #
-#     order = None
-#     while order is None:
-#         if keyboard.is_pressed('1'):
-#             order = 1
-#         elif keyboard.is_pressed('2'):
-#             order = 2
+    # order = None
+    # while order is None:
+    #     if keyboard.is_pressed('1'):
+    #         order = 1
+    #     elif keyboard.is_pressed('2'):
+    #         order = 2
+
 
     if not initialized:
         for i in range(5):
             time.sleep(.1)
             # if order == 1:
-            #     buy = open_buy(trading_data)
+            buy = open_buy(trading_data)
             # elif order == 2:
-            sell = open_sell(trading_data)
+            #     sell = open_sell(trading_data)
         initialized = True
 
     while not pill2kill.wait(0.1):
         # TODO REMOVE PRINT STATEMENT
         # print(check_buy(), check_sell(), last_operation, TIME_BETWEEN_OPERATIONS)
         order = 2
-        if check_buy() and last_operation > TIME_BETWEEN_OPERATIONS:
-            buy = open_sell(trading_data)
+        if check_sell() and last_operation > TIME_BETWEEN_OPERATIONS:
+            buy = open_buy(trading_data)
             last_operation = 0
             if buy is not None:
                 order = 0
@@ -372,8 +374,8 @@ def thread_orders(pill2kill, trading_data: dict):
                 # handle_buy(buy, trading_data['market'])
                 buy = None
 
-        if check_sell() and last_operation > TIME_BETWEEN_OPERATIONS:
-            sell = open_sell(trading_data)
+        if check_buy() and last_operation > TIME_BETWEEN_OPERATIONS:
+            sell = open_buy(trading_data)
             last_operation = 0
             if sell is not None:
                 order = 2
