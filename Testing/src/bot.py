@@ -122,7 +122,7 @@ class Bot:
         Returns:
             tpqoa.tpqoa: oanda api
         """
-        self.api = tpqoa.tpqoa('oanda.cfg')
+        # self.api = tpqoa.tpqoa('oanda.cfg')
         print('Login initialized')
         return self.api
 

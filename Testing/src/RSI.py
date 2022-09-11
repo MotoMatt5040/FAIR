@@ -1,5 +1,5 @@
 # Global variables
-N_for_RSI = 14
+N_for_RSI = 7
 RSI_value = None
 # TODO RSI = 14
 

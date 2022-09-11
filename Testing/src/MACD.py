@@ -9,9 +9,9 @@ PREV_EMA9 = None
 PREV_EMA12 = None
 PREV_EMA26 = None
 
-MAX_LEN = 9
-ema_fast = 12
-ema_slow = 26
+MAX_LEN = 4
+ema_fast = 6
+ema_slow = 13
 
 # TODO MAX_LEN = 9, ema_fast = 12, ema_slow = 26
 

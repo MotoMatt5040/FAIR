@@ -22,7 +22,7 @@ import bot
 
 # Creating a bot
 # TODO Fix bot statement
-b = bot.Bot(10.0, 60, "EURUSD")
+b = bot.Bot(0.01, 60, "US30")
 # b = bot.Bot(5.0, 60 * 15, "USDJPY!")
 
 # markets = ['EURUSD', 'GBPUSD', 'XAUUSD', 'USDJPY']
@@ -35,51 +35,54 @@ b = bot.Bot(10.0, 60, "EURUSD")
 #     usr = int(lines[0])
 #     password = lines[1]
 
-print('''Which account would you like to use
-    1: MT5 Demo
-    2: Hanko Demo
-    3: Traders Domain - Live
-    4: Vital Markets - Demo''')
-usr = None
-password = None
-while usr is None or password is None:
-    if keyboard.is_pressed('1'):
-        usr = 5003534489
-        password = '6jsxifbk'
-        print(f'\nYou selected: {usr}\n')
-    elif keyboard.is_pressed('2'):
-        usr = 805062
-        password = 'R6rz@i@Ue!#bCAn'
-        print(f'\nYou selected: {usr}\n')
-    elif keyboard.is_pressed('3'):
-        usr = 10035241
-        password = 'R3k5tpbz'
-        print(f'\nYou selected: {usr}\n')
-    elif keyboard.is_pressed('4'):
-        usr = 182963
-        password = 'GQhPJhcFAT'
-        print(f'\nYou selected: {usr}\n')
-
-time.sleep(0.1)
-print('''Which server would you like to connect to?
-    1: MetaQuotes-Demo
-    2: OANDA-Demo-2
-    3: TradersDomainFX-MetaTrader5
-    4: VitalMarkets-Demo''')
-server = None
-while server is None:
-    if keyboard.is_pressed('1'):
-        server = 'MetaQuotes-Demo'
-        print(f'\nYou selected: {server}\n')
-    elif keyboard.is_pressed('2'):
-        server = 'OANDA-Demo-2'
-        print(f'\nYou selected: {server}\n')
-    elif keyboard.is_pressed('3'):
-        server = 'TradersDomainFX-MetaTrader5'
-        print(f'\nYou selected: {server}\n')
-    elif keyboard.is_pressed('4'):
-        server = 'VitalMarkets-Demo'
-        print(f'\nYou selected: {server}\n')
+# print('''Which account would you like to use
+#     1: MT5 Demo
+#     2: Hanko Demo
+#     3: Traders Domain - Live
+#     4: Vital Markets - Demo''')
+# usr = None
+# password = None
+# while usr is None or password is None:
+#     if keyboard.is_pressed('1'):
+#         usr = 5003534489
+#         password = '6jsxifbk'
+#         print(f'\nYou selected: {usr}\n')
+#     elif keyboard.is_pressed('2'):
+#         usr = 805062
+#         password = 'R6rz@i@Ue!#bCAn'
+#         print(f'\nYou selected: {usr}\n')
+#     elif keyboard.is_pressed('3'):
+#         usr = 10035241
+#         password = 'R3k5tpbz'
+#         print(f'\nYou selected: {usr}\n')
+#     elif keyboard.is_pressed('4'):
+#         usr = 182963
+#         password = 'GQhPJhcFAT'
+#         print(f'\nYou selected: {usr}\n')
+#
+# time.sleep(0.1)
+# print('''Which server would you like to connect to?
+#     1: MetaQuotes-Demo
+#     2: OANDA-Demo-2
+#     3: TradersDomainFX-MetaTrader5
+#     4: VitalMarkets-Demo''')
+# server = None
+# while server is None:
+#     if keyboard.is_pressed('1'):
+#         server = 'MetaQuotes-Demo'
+#         print(f'\nYou selected: {server}\n')
+#     elif keyboard.is_pressed('2'):
+#         server = 'OANDA-Demo-2'
+#         print(f'\nYou selected: {server}\n')
+#     elif keyboard.is_pressed('3'):
+#         server = 'TradersDomainFX-MetaTrader5'
+#         print(f'\nYou selected: {server}\n')
+#     elif keyboard.is_pressed('4'):
+#         server = 'VitalMarkets-Demo'
+#         print(f'\nYou selected: {server}\n')
+usr = 185201
+password = 'bpfnyNVumH'
+server = 'VitalMarkets-Demo'
 
 # # Login into mt5
 if not b.mt5_login(usr, password, server):
