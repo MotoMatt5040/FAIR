@@ -9,12 +9,12 @@ TP_MARGIN = 1
 # TODO ADJUST TIME BETWEEN OPERATIONS
 # TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
 TIME_BETWEEN_OPERATIONS = 60
-STOPLOSS = 6000
-TAKEPROFIT = 4000
-TRAIL_AMOUNT = 50  # 50 pips
+STOPLOSS = 4500
+TAKEPROFIT = 2500
+# TRAIL_AMOUNT = 50  # 50 pips
 
 
-def handle_stoploss(order: int, position):
+# def handle_stoploss(order: int, position):
     # ticket = position.ticket
     # symbol = position.symbol
     # order_type = position.type
@@ -44,7 +44,7 @@ def handle_stoploss(order: int, position):
     #     sl = price_open - TRAIL_AMOUNT if order_type == 0 else price_open + TRAIL_AMOUNT
     #     return
     # return result
-    pass
+    # pass
 
 def handle_buy(buy, market):
     """Function to handle a buy operation.

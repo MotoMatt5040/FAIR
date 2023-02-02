@@ -11,18 +11,23 @@ import bot
 
 # Creating a bot
 # TODO Fix bot statement
-b = bot.Bot(0.02, 60, "US30")
+b = bot.Bot(0.1, 60, "US30")
 # b = bot.Bot(5.0, 60 * 15, "USDJPY!")
 
 #dakota
-usr = 10024165
-password = 'mCUBPFKnQf'
+# usr = 10024165
+# password = 'mCUBPFKnQf'
 
 #matt
 # usr = 10024028
 # password = 'qMnkbKzXHG'
+#
+# server = 'VitalMarkets-Live'
 
-server = 'VitalMarkets-Live'
+usr = 185201
+password = 'bpfnyNVumH'
+server = 'VitalMarkets-Demo'
+
 
 # # Login into mt5
 if not b.mt5_login(usr, password, server):

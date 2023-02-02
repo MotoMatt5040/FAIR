@@ -10,8 +10,8 @@ TP_MARGIN = 1
 # TODO ADJUST TIME BETWEEN OPERATIONS
 # TIME_BETWEEN_OPERATIONS = 5 * 60 * 10
 TIME_BETWEEN_OPERATIONS = 60
-STOPLOSS = 12000
-TAKEPROFIT = 10000
+STOPLOSS = 15000
+TAKEPROFIT = 15000
 TRAIL_AMOUNT = 50  # 50 pips
 
 
@@ -81,7 +81,7 @@ def handle_buy(buy, market):
                 "position": position
             }
             GOAL = tick.ask + 1 * point
-            print(tick.ask - (MARGIN - margin_adjustment) * point)
+            # print(tick.ask - (MARGIN - margin_adjustment) * point)
             move = True
             if move:
                 if margin_adjustment < 380:
@@ -92,7 +92,7 @@ def handle_buy(buy, market):
                 #     margin_adjustment = MARGIN - 40
                 # elif margin_adjustment > 80:
                 #     margin_adjustment = MARGIN - 20
-                print(MARGIN - margin_adjustment)
+                # print(MARGIN - margin_adjustment)
                 move = False
             # mt5.order_send(request)
         # print(tick.ask * point)
@@ -112,7 +112,7 @@ def handle_sell(sell, market: str):
 
     Args:
         sell : Sell operation.
-        market (str): Market where the operation was openned.
+        market (str): Market where the operation was opened.
     """
     position = mt5.positions_get(symbol=market)[-1].ticket
     point = mt5.symbol_info(market).point
@@ -139,7 +139,7 @@ def handle_sell(sell, market: str):
                 "position": position
             }
             GOAL = tick.bid - 1 * point
-            print(tick.ask - (MARGIN - margin_adjustment) * point)
+            # print(tick.ask - (MARGIN - margin_adjustment) * point)
             move = True
             if move:
                 if margin_adjustment < 380:
@@ -150,7 +150,7 @@ def handle_sell(sell, market: str):
                 #     margin_adjustment = MARGIN - 40
                 # elif margin_adjustment > 80:
                 #     margin_adjustment = MARGIN - 20
-                print(MARGIN - margin_adjustment)
+                # print(MARGIN - margin_adjustment)
                 move = False
             # mt5.order_send(request)
         # print(tick.ask * point)
@@ -350,14 +350,14 @@ def thread_orders(pill2kill, trading_data: dict):
     #         order = 2
 
 
-    if not initialized:
-        for i in range(2):
-            time.sleep(.1)
-            # if order == 1:
-            buy = open_buy(trading_data)
-            # elif order == 2:
-            #     sell = open_sell(trading_data)
-        initialized = True
+    # if not initialized:
+    #     for i in range(2):
+    #         time.sleep(.1)
+    #         # if order == 1:
+    #         buy = open_buy(trading_data)
+    #         # elif order == 2:
+    #         #     sell = open_sell(trading_data)
+    #     initialized = True
 
     while not pill2kill.wait(0.1):
         # TODO REMOVE PRINT STATEMENT
