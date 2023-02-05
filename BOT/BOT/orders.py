@@ -359,11 +359,13 @@ def thread_orders(pill2kill, trading_data: dict):
     #         #     sell = open_sell(trading_data)
     #     initialized = True
 
+    # TODO Verrify that buy/sell operation is working properly.
+
     while not pill2kill.wait(0.1):
         # TODO REMOVE PRINT STATEMENT
         # print(check_buy(), check_sell(), last_operation, TIME_BETWEEN_OPERATIONS)
         order = 2
-        if check_sell() and last_operation > TIME_BETWEEN_OPERATIONS:
+        if check_buy() and last_operation > TIME_BETWEEN_OPERATIONS:
             buy = open_buy(trading_data)
             last_operation = 0
             if buy is not None:
@@ -374,15 +376,15 @@ def thread_orders(pill2kill, trading_data: dict):
                 handle_buy(buy, trading_data['market'])
                 buy = None
 
-        if check_buy() and last_operation > TIME_BETWEEN_OPERATIONS:
-            sell = open_buy(trading_data)
+        if check_sell() and last_operation > TIME_BETWEEN_OPERATIONS:
+            sell = open_sell(trading_data)
             last_operation = 0
             if sell is not None:
                 order = 2
                 now = date.datetime.now()
                 dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
                 print("[Thread - orders] Sell open -", dt_string)
-                handle_buy(sell, trading_data['market'])
+                handle_sell(sell, trading_data['market'])
                 sell = None
 
         last_operation += 1
